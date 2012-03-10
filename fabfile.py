@@ -226,27 +226,30 @@ def dbshell():
     managepy('dbshell')
 
 
-def _dumpdb():
-    managepy('dumpdb')
+def _dumpdb(dest_file=None):
+    if dest_file:
+        managepy('dumpdb --output {}'.format(dest_file))
+    else:
+        managepy('dumpdb')
 
 
 @projtask
-def dumpdb():
+def dumpdb(dest_file=None):
     '''dumpdb'''
-    _dumpdb()
+    _dumpdb(dest_file)
 
 
 def app_to_dbfilename(app):
-    return expanduser('~/{}.sql.gz'.format(app.name))
+    return '~/{}.sql.gz'.format(app.name)
 
 @projtask
-def getdb():
+def getdb(dest_file=None):
     '''Get db from projects and place them in ~ and ~/Backups/xxx/'''
-    _dumpdb()
-    dest_file = app_to_dbfilename(env.app)
-    get('rs.sql.gz', dest_file)
+    dest_file = dest_file or app_to_dbfilename(env.app)
+    _dumpdb(dest_file)
+    get(dest_file, dest_file)
     from shutil import copyfile
-    copyfile(dest_file, expanduser(
+    copyfile(expanduser(dest_file), expanduser(
         '~/Backups/websites/{}/db{}.sql.gz'.format(
         env.app.name,
         datetime.now().strftime('%d%b%Y'))))
