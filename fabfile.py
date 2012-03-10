@@ -41,10 +41,14 @@ compass watch, celeryd, nosetests
 shell_plus, runscript
 '''
 
+from collections import defaultdict
+import inspect
 from datetime import datetime
 from functools import wraps
 from itertools import chain
 from os.path import expanduser
+import re
+import sys
 
 
 from fabric.api import *
