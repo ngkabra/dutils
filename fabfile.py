@@ -265,9 +265,9 @@ def getreplacedb():
 @projtask
 def replacedb(db, demo=None):
     '''Replace local db with {db}. {demo}=True will fix_demo.'''
-    if not 'local' in env.app.name or not 'demo' in env.app.name:
-        abort('WTF?! Trying to replace production?')
-    run(env.app.python + ' scripts/replacedb.py {demo} {db}'.format(
+    if not 'local' in env.app.name and not 'demo' in env.app.name:
+        abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
+    run(env.app.python + ' dutils/replacedb.py {demo} {db}'.format(
         demo='-d' if demo else '',
         db=db))
 

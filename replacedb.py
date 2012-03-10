@@ -62,15 +62,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--demo', action='store_true',
                     help='Prep db for demo after loading')
 parser.add_argument('file', help='Dump of database')
+parser.add_argument('-f', '--fixdemoscript',
+                    default='scripts.pyfixtures.fix_demo',
+                    help='dotted path for fix_demo script')
 args = parser.parse_args()
 
 replace_db(args.file)
 
+from django.core.management import setup_environ, ManagementUtility
+setup_environ(settings)
+cmds = [['syncdb'], ['migrate']]
 if args.demo:
-  from django.core.management import setup_environ, ManagementUtility
-  setup_environ(settings)
-  for cmd in [['syncdb'],
-               ['migrate'],
-               ['runscript', 'scripts.pyfixtures.fix_demo']]:
-      utility = ManagementUtility([sys.argv[0]] + cmd)
-      utility.execute()
+    cmds.append(['runscript', args.fixdemoscript])
+for cmd in cmds:
+    utility = ManagementUtility([sys.argv[0]] + cmd)
+    utility.execute()
