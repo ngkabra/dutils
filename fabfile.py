@@ -166,16 +166,16 @@ def findmigs(appname):
     managepy('schemamigration {0} --auto'.format(appname))
 
 
-def _jsgen(has_dajax=True, dir='base/static/js'):
+def jsgen_(has_dajax=True, dir='base/static/js'):
     '''Generate and combine javascript files'''
     if has_dajax:
         managepy('generate_static_dajaxice > {}/dajaxice.js'.format(jsdir))
-    run('python dutils/jscombine.py -d {}'.format(jsdir))
+    run('python dutils/jscombine.py -d {}'.format(dir))
 
 
-def _compass(dir='base/static'):
+def compass_(dir='base/static'):
     '''Run compass watch'''
-    local('cd base/static/ && compass watch')
+    local('cd {} && compass watch'.format(dir))
 
 
 @localtask
