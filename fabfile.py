@@ -371,6 +371,12 @@ def mcmd(c):
     '''manage.py {c} - at remote'''
     managepy(c)
 
+
+@wftask
+def wfinstall(package):
+    run('easy_install-2.7 {}'.format(package))
+
+
 def help(func=None, cat=None):
     '''Print a nice list of fab commands'''
     flist = defaultdict(list)
