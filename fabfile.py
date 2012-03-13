@@ -374,6 +374,7 @@ def mcmd(c):
 
 @wftask
 def wfinstall(package):
+    'Install package on webfaction machine'
     run('easy_install-2.7 {}'.format(package))
 
 
