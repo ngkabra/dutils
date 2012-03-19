@@ -199,20 +199,35 @@ def pwd():
 @projtask
 def serve():
     '''Run manage.py runserver'''
-    managepy('runserver')
+    managepy('runserver_plus')
 
+
+def nose_opts():
+    try:
+        import pinocchio
+    except ImportError:
+        return []
+    return ['--with-stopwatch']
+
+def test_cmd():
+    return 'test -x ' + ' '.join(nose_opts())
 
 @projtask
 def testfailed(options=''):
     '''manage.py test -x --failed {options}'''
-    managepy('test -x --failed ' + options)
+    managepy('{} --failed {}'.format(test_cmd(), options))
 
 
 @projtask
 def test(options=''):
     '''manage.py test -x {options}'''
-    managepy('test -x ' + options)
+    managepy('{} {}'.format(test_cmd(), options))
 
+@projtask
+def quicktest(seconds=5):
+    '''run only tests faster than seconds seconds'''
+    managepy('{cmd} --faster-than{seconds} {opts}'.format(cmd=test_cmd(),
+                                                          seconds=seconds))
 
 @projtask
 def shell():
