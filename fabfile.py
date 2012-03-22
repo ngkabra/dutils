@@ -210,17 +210,17 @@ def nose_opts():
     return ['--with-stopwatch']
 
 def test_cmd():
-    return 'test -x ' + ' '.join(nose_opts())
+    return 'test ' + ' '.join(nose_opts())
 
 @projtask
 def testfailed(options=''):
-    '''manage.py test -x --failed {options}'''
+    '''test with --failed {options}'''
     managepy('{} --failed {}'.format(test_cmd(), options))
 
 
 @projtask
 def test(options=''):
-    '''manage.py test -x {options}'''
+    '''run managepy test with {options}'''
     managepy('{} {}'.format(test_cmd(), options))
 
 @projtask
