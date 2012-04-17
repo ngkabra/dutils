@@ -254,18 +254,41 @@ def dumpdb(dest_file=None):
     _dumpdb(dest_file)
 
 
+def _dumpmedia(dest_file=None):
+    if dest_file:
+        managepy('dumpmedia --output {}'.format(dest_file))
+    else:
+        managepy('dumpmedia')
+
+
+@projtask
+def dumpmedia(dest_file=None):
+    '''dump site_media into project-media.gz'''
+    _dumpdb(dest_file)
+
+
 def app_to_dbfilename(app):
     return '~/{}.sql.gz'.format(app.name)
 
+def app_to_mediafilename(app):
+    return '~/{}-media.gz'.format(app.name)
+
 @projtask
-def getdb(dest_file=None):
-    '''Get db from projects and place them in ~ and ~/Backups/xxx/'''
-    dest_file = dest_file or app_to_dbfilename(env.app)
-    _dumpdb(dest_file)
-    get(dest_file, dest_file)
+def getdb(db_dest_file=None, media_dest_file=None):
+    '''Get db/media from projects and place them in ~ and ~/Backups/xxx/'''
+    db_dest_file = db_dest_file or app_to_dbfilename(env.app)
+    media_dest_file = media_dest_file or app_to_mediafilename(env.app)
+    _dumpdb(db_dest_file)
+    _dumpmedia(media_dest_file)
+    get(db_dest_file, db_dest_file)
+    get(db_media_file, db_media_file)
     from shutil import copyfile
-    copyfile(expanduser(dest_file), expanduser(
+    copyfile(expanduser(db_dest_file), expanduser(
         '~/Backups/websites/{}/db{}.sql.gz'.format(
+        env.app.name,
+        datetime.now().strftime('%d%b%Y'))))
+    copyfile(expanduser(media_dest_file), expanduser(
+        '~/Backups/websites/{}/media{}.gz'.format(
         env.app.name,
         datetime.now().strftime('%d%b%Y'))))
 
@@ -276,23 +299,30 @@ def getreplacedb():
     if len(env.apps) != 1:
         abort('What is wrong with you?')
     getdb()
-    filename = app_to_dbfilename(env.apps[0])
+    db_filename = app_to_dbfilename(env.apps[0])
+    media_filename = app_to_mediafilename(env.apps[0])
     apps('localhost')
-    replacedb(db=filename, demo=False)
+    replacedb(db=db_filename, demo=False)
+    replacedb(mediafile=media_filename)
 
 @projtask
 def replacedb(db, demo=None):
-    '''Replace local db with {db}. {demo}=True will fix_demo.'''
+    'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if not 'local' in env.app.name and not 'demo' in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
     run(env.app.python + ' dutils/replacedb.py {demo} {db}'.format(
         demo='-d' if demo else '',
         db=db))
 
+@projtask
+def replacemedia(mediafile):
+    '''Replace site_media with {mediafile}.'''
+    if not 'local' in env.app.name and not 'demo' in env.app.name:
+        abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
+    run('tar -xvzf {}'.format(mediafile))
 
 def _runscript(script):
     managepy('runscript {0}'.format(script))
-
 
 @projtask
 def runscript(script):
