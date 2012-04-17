@@ -281,7 +281,7 @@ def getdb(db_dest_file=None, media_dest_file=None):
     _dumpdb(db_dest_file)
     _dumpmedia(media_dest_file)
     get(db_dest_file, db_dest_file)
-    get(db_media_file, db_media_file)
+    get(media_dest_file, media_dest_file)
     from shutil import copyfile
     copyfile(expanduser(db_dest_file), expanduser(
         '~/Backups/websites/{}/db{}.sql.gz'.format(
