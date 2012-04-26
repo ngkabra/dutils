@@ -303,7 +303,7 @@ def getreplacedb():
     media_filename = app_to_mediafilename(env.apps[0])
     apps('localhost')
     replacedb(db=db_filename, demo=False)
-    replacedb(mediafile=media_filename)
+    replacemedia(mediafile=media_filename)
 
 @projtask
 def replacedb(db, demo=None):
