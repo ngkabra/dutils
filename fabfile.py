@@ -264,7 +264,7 @@ def _dumpmedia(dest_file=None):
 @projtask
 def dumpmedia(dest_file=None):
     '''dump site_media into project-media.gz'''
-    _dumpdb(dest_file)
+    _dumpmedia(dest_file)
 
 
 def app_to_dbfilename(app):
@@ -274,19 +274,23 @@ def app_to_mediafilename(app):
     return '~/{}-media.gz'.format(app.name)
 
 @projtask
-def getdb(db_dest_file=None, media_dest_file=None):
-    '''Get db/media from projects and place them in ~ and ~/Backups/xxx/'''
+def getdbonly(db_dest_file=None):
+    '''Get db (no media) from projects and place them in ~ and ~/Backups/xxx/'''
     db_dest_file = db_dest_file or app_to_dbfilename(env.app)
-    media_dest_file = media_dest_file or app_to_mediafilename(env.app)
     _dumpdb(db_dest_file)
-    _dumpmedia(media_dest_file)
     get(db_dest_file, db_dest_file)
-    get(media_dest_file, media_dest_file)
     from shutil import copyfile
     copyfile(expanduser(db_dest_file), expanduser(
         '~/Backups/websites/{}/db{}.sql.gz'.format(
         env.app.name,
         datetime.now().strftime('%d%b%Y'))))
+
+@projtask
+def getmediaonly(db_dest_file=None, media_dest_file=None):
+    '''Get media (no db) from projects and place them in ~ and ~/Backups/xxx/'''
+    media_dest_file = media_dest_file or app_to_mediafilename(env.app)
+    _dumpmedia(media_dest_file)
+    get(media_dest_file, media_dest_file)
     copyfile(expanduser(media_dest_file), expanduser(
         '~/Backups/websites/{}/media{}.gz'.format(
         env.app.name,
@@ -294,16 +298,27 @@ def getdb(db_dest_file=None, media_dest_file=None):
 
 
 @cmd_category('Local only')
-def getreplacedb():
+def getreplacedb(dbonly=None, mediaonly=None):
     '''Get db from remote replace local db. Dont fix demo'''
+    if dbonly and mediaonly:
+        abort('Cant specify both flags')
+
     if len(env.apps) != 1:
         abort('What is wrong with you?')
-    getdb()
+    if not mediaonly:
+        getdbonly()
+
+    if not dbonly:
+        getmediaonly()
+
     db_filename = app_to_dbfilename(env.apps[0])
     media_filename = app_to_mediafilename(env.apps[0])
     apps('localhost')
-    replacedb(db=db_filename, demo=False)
-    replacemedia(mediafile=media_filename)
+
+    if not mediaonly:
+        replacedb(db=db_filename, demo=False)
+    if not dbonly:
+        replacemedia(mediafile=media_filename)
 
 @projtask
 def replacedb(db, demo=None):
