@@ -34,7 +34,10 @@ def replace_db(dbfile):
     rootdb = mysql.connect(user=db['NAME'],
                            passwd=db['PASSWORD'])
     c = rootdb.cursor()
-    c.execute('drop database %s' % db['NAME'])
+    try:
+        c.execute('drop database %s' % db['NAME'])
+    except:
+        pass                              # ignore drop database errors
     c.execute('create database %s character set utf8 collate utf8_general_ci' % db['NAME'])
     c.close()
     rootdb.close()

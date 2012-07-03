@@ -291,6 +291,7 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
     media_dest_file = media_dest_file or app_to_mediafilename(env.app)
     _dumpmedia(media_dest_file)
     get(media_dest_file, media_dest_file)
+    from shutil import copyfile
     copyfile(expanduser(media_dest_file), expanduser(
         '~/Backups/websites/{}/media{}.gz'.format(
         env.app.name,
@@ -336,13 +337,13 @@ def replacemedia(mediafile):
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
     run('tar -xvzf {}'.format(mediafile))
 
-def _runscript(script):
+def runscript_(script):
     managepy('runscript {0}'.format(script))
 
 @projtask
 def runscript(script):
     '''manage.py runscript {script}'''
-    _runscript(script)
+    runscript_(script)
 
 @projtask
 def push():
