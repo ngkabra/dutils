@@ -166,10 +166,11 @@ def findmigs(appname):
     managepy('schemamigration {0} --auto'.format(appname))
 
 
+@localtask
 def jsgen_(has_dajax=True, dir='base/static/js'):
     '''Generate and combine javascript files'''
     if has_dajax:
-        managepy('generate_static_dajaxice > {}/dajaxice.js'.format(jsdir))
+        managepy('generate_static_dajaxice > {}/dajaxice.js'.format(dir))
     run('python dutils/jscombine.py -d {}'.format(dir))
 
 
