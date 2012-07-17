@@ -87,7 +87,7 @@ class WFApp(App):
     def home(self):
         return '/home/{0}'.format(env.user)
 
-    def __init__(self, name, host='web145'):
+    def __init__(self, name, host):
         dir = '{home}/webapps/{name}'.format(home=self.home,
                                              name=name)
         projdir = '{dir}/myproject'.format(dir=dir)
