@@ -322,6 +322,16 @@ def getreplacedb(dbonly=None, mediaonly=None):
     if not dbonly:
         replacemedia(mediafile=media_filename)
 
+@cmd_category('Local only')
+def getreplacedbonly():
+    getreplacedb(dbonly=True)
+
+@cmd_category('Local only')
+def getreplacedball():
+    getreplacedb(dbonly=True)
+
+
+
 @projtask
 def replacedb(db, demo=None):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
