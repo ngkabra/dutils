@@ -211,6 +211,7 @@ def nose_opts():
     return ['--with-stopwatch']
 
 def test_cmd():
+    '''Test command'''
     return 'test ' + ' '.join(nose_opts())
 
 @projtask
@@ -324,10 +325,12 @@ def getreplacedb(dbonly=None, mediaonly=None):
 
 @cmd_category('Local only')
 def getreplacedbonly():
+    '''Get db (no media) and replace'''
     getreplacedb(dbonly=True)
 
 @cmd_category('Local only')
 def getreplacedball():
+    '''Get db and media and replace'''
     getreplacedb(dbonly=True)
 
 
@@ -380,6 +383,7 @@ def syncdb():
 
 
 def _media(link=None):
+    '''upgrade the media - do collectstatic'''
     cmd = 'collectstatic --noinput'
     if link is None:
         link = env.app.host == 'localhost'
@@ -467,5 +471,8 @@ def help(func=None, cat=None):
     for c, funcs in flist.iteritems():
         print '{}:'.format(c)
         for f in funcs:
-            doc = f.__doc__.replace('\n', '    \n')
+            if f.__doc__:
+                doc = f.__doc__.replace('\n', '    \n')
+            else:
+                doc = 'Lazy bum. No __doc__ for {f.__name__}'.format(f=f)
             print '    {f.__name__}: {doc}'.format(f=f, doc=doc)
