@@ -368,6 +368,8 @@ def push():
 def _pull():
     run('git pull')
 
+def _submodule_update():
+    run('git submodule update')
 
 def _migrate(apps=''):
     '''Here, apps are django apps, not fab apps'''
@@ -425,6 +427,7 @@ def restart():
 def upgrade():
     '''pull, syncdb, migrate, media, restart.'''
     execute(_pull)
+    execute(_submodule_update)
     execute(_syncdb)
     execute(_migrate)
     execute(_media)
