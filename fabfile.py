@@ -47,6 +47,8 @@ from datetime import datetime
 from functools import wraps
 from itertools import chain
 from os.path import expanduser
+from shutil import move
+from os import symlink
 import re
 import sys
 
@@ -275,17 +277,22 @@ def app_to_dbfilename(app):
 def app_to_mediafilename(app):
     return '~/{}-media.gz'.format(app.name)
 
+def move_and_link(src, dest):
+    move(src, dest)
+    symlink(dest, src)
+
+
 @projtask
 def getdbonly(db_dest_file=None):
     '''Get db (no media) from projects and place them in ~ and ~/Backups/xxx/'''
     db_dest_file = db_dest_file or app_to_dbfilename(env.app)
     _dumpdb(db_dest_file)
     get(db_dest_file, db_dest_file)
-    from shutil import copyfile
-    copyfile(expanduser(db_dest_file), expanduser(
-        '~/Backups/websites/{}/db{}.sql.gz'.format(
-        env.app.name,
-        datetime.now().strftime('%d%b%Y'))))
+    move_and_link(expanduser(db_dest_file),
+                  expanduser(
+                      '~/Backups/websites/{}/db{}.sql.gz'.format(
+                          env.app.name,
+                          datetime.now().strftime('%d%b%Y'))))
 
 @projtask
 def getmediaonly(db_dest_file=None, media_dest_file=None):
@@ -293,8 +300,7 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
     media_dest_file = media_dest_file or app_to_mediafilename(env.app)
     _dumpmedia(media_dest_file)
     get(media_dest_file, media_dest_file)
-    from shutil import copyfile
-    copyfile(expanduser(media_dest_file), expanduser(
+    move_and_link(expanduser(media_dest_file), expanduser(
         '~/Backups/websites/{}/media{}.gz'.format(
         env.app.name,
         datetime.now().strftime('%d%b%Y'))))
