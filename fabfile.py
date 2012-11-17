@@ -30,9 +30,10 @@ NOTE/WARNING: replacedb this will not work unless dutils is in the
 contain manage.py
 
 # Other Local setup expected
-virtualenv in - ~/.v/p27/
-Backup directories = ~/Backups/websites/{appname}/
-
+in <LOCAL>/fabfile.py:
+  from fabric.api import env
+  env.virtualenv = '~/.v/p27' # without trailing slash
+  env.backups_dir = '~/Backups/websites' # without trailing slash
 
 # Things that just work, if right things are installed
 tags, jsgen, generate_static_dajaxice,
@@ -76,10 +77,12 @@ class App(object):
 from os import getcwd
 class LocalApp(App):
     def __init__(self, name='localhost', dir=getcwd(), projdir=getcwd()):
+        virtualenv = env.virtualenv
+        prefix = 'source {}/bin/activate'.format(virtualenv)
         super(LocalApp, self).__init__(name=name,
                                        dir=dir,
                                        projdir=projdir,
-                                       prefix='source ~/.v/p27/bin/activate',
+                                       prefix=prefix,
                                        )
         self.host = 'localhost'
 
@@ -284,26 +287,28 @@ def move_and_link(src, dest):
 
 @projtask
 def getdbonly(db_dest_file=None):
-    '''Get db (no media) from projects and place them in ~ and ~/Backups/xxx/'''
+    '''Get db (no media) from projects and place them in env.backups_dir & ~'''
     db_dest_file = db_dest_file or app_to_dbfilename(env.app)
     _dumpdb(db_dest_file)
     get(db_dest_file, db_dest_file)
     move_and_link(expanduser(db_dest_file),
                   expanduser(
-                      '~/Backups/websites/{}/db{}.sql.gz'.format(
+                      '{}/{}/db{}.sql.gz'.format(
+                          env.backups_dir,
                           env.app.name,
                           datetime.now().strftime('%d%b%Y'))))
 
 @projtask
 def getmediaonly(db_dest_file=None, media_dest_file=None):
-    '''Get media (no db) from projects and place them in ~ and ~/Backups/xxx/'''
+    '''Get media (no db) from projects and place them env.backups_dir & ~'''
     media_dest_file = media_dest_file or app_to_mediafilename(env.app)
     _dumpmedia(media_dest_file)
     get(media_dest_file, media_dest_file)
     move_and_link(expanduser(media_dest_file), expanduser(
-        '~/Backups/websites/{}/media{}.gz'.format(
-        env.app.name,
-        datetime.now().strftime('%d%b%Y'))))
+        '{}/{}/media{}.gz'.format(
+            env.backups_dir,
+            env.app.name,
+            datetime.now().strftime('%d%b%Y'))))
 
 
 @cmd_category('Local only')
