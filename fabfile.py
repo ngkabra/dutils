@@ -184,12 +184,6 @@ def compass_(dir='base/static'):
     local('cd {} && compass watch'.format(dir))
 
 
-@localtask
-def celery():
-    '''Run celery'''
-    managepy('celeryd -l info')
-
-
 @wftask
 def ls():
     '''Run ls'''
