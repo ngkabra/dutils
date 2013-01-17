@@ -68,15 +68,23 @@ parser.add_argument('file', help='Dump of database')
 parser.add_argument('-f', '--fixdemoscript',
                     default='scripts.pyfixtures.fix_demo',
                     help='dotted path for fix_demo script')
+parser.add_argument('-n', '--no-syncdb',
+                    action='store_true',
+                    help='dont do syncdb or migrate')
 args = parser.parse_args()
 
 replace_db(args.file)
 
 from django.core.management import setup_environ, ManagementUtility
 setup_environ(settings)
-cmds = [['syncdb'], ['migrate']]
+
+if args.no_syncdb:
+    cmds = []
+else:
+    cmds = [['syncdb'], ['migrate']]
+
 if args.demo:
-    cmds.append(['runscript', args.fixdemoscript])
+    cmds.append(['runcmd', args.fixdemoscript])
 for cmd in cmds:
     utility = ManagementUtility([sys.argv[0]] + cmd)
     utility.execute()

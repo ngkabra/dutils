@@ -341,12 +341,13 @@ def getreplacedball():
 
 
 @projtask
-def replacedb(db, demo=None):
+def replacedb(db, demo=None, nosync=None):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if not 'local' in env.app.name and not 'demo' in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
-    run(env.app.python + ' dutils/replacedb.py {demo} {db}'.format(
+    run(env.app.python + ' dutils/replacedb.py {demo} {nosync} {db}'.format(
         demo='-d' if demo else '',
+        nosync='-n' if nosync else '',
         db=db))
 
 @projtask
