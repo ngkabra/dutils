@@ -381,6 +381,7 @@ def _submodule_update():
 def fakeinit_migs():
     'Re-initialize migrations after resetmigs'
     execute(_pull)
+    execute(_submodule_update)
     managepy('runcmd scripts.resetmigs fakeinit_migs')
 
 def _migrate(apps=''):
