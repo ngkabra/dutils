@@ -377,6 +377,12 @@ def _pull():
 def _submodule_update():
     run('git submodule update')
 
+@projtask
+def fakeinit_migs():
+    'Re-initialize migrations after resetmigs'
+    execute(_pull)
+    managepy('runcmd scripts.resetmigs fakeinit_migs')
+
 def _migrate(apps=''):
     '''Here, apps are django apps, not fab apps'''
     managepy('migrate -v 0 {}'.format(apps))
