@@ -11,7 +11,7 @@ from being sent.
 '''
 
 import argparse
-from os.path import dirname
+from os.path import dirname, exists, expanduser
 import sys
 import subprocess
 import MySQLdb as mysql
@@ -23,6 +23,15 @@ sys.path.insert(0, topdir)
 import settings
 
 def replace_db(dbfile):
+    if not exists(dbfile):
+        for f in (dbfile + '.sql.gz',
+                  expanduser('~/' + dbfile + '.sql.gz')):
+            if exists(f):
+                dbfile = f
+                break
+        else:
+            raise Exception('{} not found'.format(dbfile))
+
     db = settings.DATABASES['default']
 
     # sanity check
