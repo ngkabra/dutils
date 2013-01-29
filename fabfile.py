@@ -47,9 +47,9 @@ import inspect
 from datetime import datetime
 from functools import wraps
 from itertools import chain
-from os.path import expanduser
+from os.path import expanduser, lexists
 from shutil import move
-from os import symlink
+from os import symlink, remove
 import re
 import sys
 
@@ -284,8 +284,12 @@ def getdbonly(db_dest_file=None):
     '''Get db (no media) from projects and place them in env.backups_dir & ~'''
     db_dest_file = db_dest_file or app_to_dbfilename(env.app)
     _dumpdb(db_dest_file)
-    get(db_dest_file, db_dest_file)
-    move_and_link(expanduser(db_dest_file),
+    local_db_dest_file = expanduser(db_dest_file)
+    if lexists(local_db_dest_file):
+        remove(local_db_dest_file)
+        # otherwise get tries to overwrite the linked file!
+    get(db_dest_file, local_db_dest_file)
+    move_and_link(local_db_dest_file,
                   expanduser(
                       '{}/{}/db{}.sql.gz'.format(
                           env.backups_dir,
@@ -297,8 +301,12 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
     '''Get media (no db) from projects and place them env.backups_dir & ~'''
     media_dest_file = media_dest_file or app_to_mediafilename(env.app)
     _dumpmedia(media_dest_file)
-    get(media_dest_file, media_dest_file)
-    move_and_link(expanduser(media_dest_file), expanduser(
+    local_media_dest_file = expanduser(media_dest_file)
+    if lexists(local_media_dest_file):
+        remove(local_media_dest_file)
+        # otherwise get tries to overwrite the symlinked file!
+    get(media_dest_file, local_media_dest_file)
+    move_and_link(local_media_dest_file, expanduser(
         '{}/{}/media{}.gz'.format(
             env.backups_dir,
             env.app.name,

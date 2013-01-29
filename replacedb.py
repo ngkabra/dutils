@@ -23,8 +23,8 @@ sys.path.insert(0, topdir)
 import settings
 
 def replace_db(dbfile):
-    if not exists(dbfile):
-        for f in (dbfile + '.sql.gz',
+    if not exists(expanduser(dbfile)):
+        for f in (expanduser(dbfile) + '.sql.gz',
                   expanduser('~/' + dbfile + '.sql.gz')):
             if exists(f):
                 dbfile = f
