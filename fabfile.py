@@ -14,15 +14,12 @@ def some_app_name():
     "Name of app"
     apps("app_name")
 # more app_names
-# call _compass with dir=<compass dir>
-# call _jsgen with has_dajax=True|False, and dir=<js dir>
+# call compass_ with dir=<compass dir>
 # rscript task for scripts directory
 # specific tasks
 
-
 # Scripts from dutils that it expects to find
 dumpdb
-dutils.jscombine (for jsgen)
 dutils.replacedb
 
 NOTE/WARNING: replacedb this will not work unless dutils is in the
@@ -36,9 +33,9 @@ in <LOCAL>/fabfile.py:
   env.backups_dir = '~/Backups/websites' # without trailing slash
 
 # Things that just work, if right things are installed
-tags, jsgen, generate_static_dajaxice,
+tags,
 findmigs (== schemamigration <appname> --auto)
-compass watch, celeryd, nosetests
+compass compile, celeryd, nosetests
 shell_plus, runscript
 '''
 
@@ -170,18 +167,9 @@ def findmigs(appname):
     '''schemamigration --auto for given {appname}'''
     managepy('schemamigration {0} --auto'.format(appname))
 
-
-@localtask
-def jsgen_(has_dajax=True, dir='base/static/js'):
-    '''Generate and combine javascript files'''
-    if has_dajax:
-        managepy('generate_static_dajaxice > {}/dajaxice.js'.format(dir))
-    run('python dutils/jscombine.py -d {}'.format(dir))
-
-
 def compass_(dir='base/static'):
-    '''Run compass watch'''
-    local('cd {} && compass watch'.format(dir))
+    '''Run compass compile'''
+    local('cd {} && compass compile'.format(dir))
 
 
 @wftask
@@ -405,13 +393,9 @@ def syncdb():
     _syncdb()
 
 
-def _media(link=None):
+def _media():
     '''upgrade the media - do collectstatic'''
     cmd = 'collectstatic --noinput'
-    if link is None:
-        link = env.app.host == 'localhost'
-    if link:
-        cmd += ' --link'
     managepy(cmd)
 
 
@@ -433,9 +417,9 @@ def migrate(apps=''):
 
 
 @projtask
-def media(link=None):
-    '''collectstatic. Automatically determines --links. Or use {link}'''
-    _media(link)
+def media():
+    '''manage.py collectstatic.'''
+    _media()
 
 
 @projtask
