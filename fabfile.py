@@ -287,18 +287,20 @@ def getdbonly(db_dest_file=None):
 @projtask
 def getmediaonly(db_dest_file=None, media_dest_file=None):
     '''Get media (no db) from projects and place them env.backups_dir & ~'''
-    media_dest_file = media_dest_file or app_to_mediafilename(env.app)
-    _dumpmedia(media_dest_file)
-    local_media_dest_file = expanduser(media_dest_file)
-    if lexists(local_media_dest_file):
-        remove(local_media_dest_file)
-        # otherwise get tries to overwrite the symlinked file!
-    get(media_dest_file, local_media_dest_file)
-    move_and_link(local_media_dest_file, expanduser(
-        '{}/{}/media{}.gz'.format(
-            env.backups_dir,
-            env.app.name,
-            datetime.now().strftime('%d%b%Y'))))
+    backup_dir = '{env.backups_dir}/{env.app.name}'.format(env=env)
+
+    media_dir = managepy('mediadir')
+    media_src = '{env.user}@{env.host}:{media_dir}'.format(
+        env=env,
+        media_dir=media_dir)
+    media_dest = backup_dir + '/media/'
+
+    local("rsync {media_src} {media_dest}".format(media_src=media_src,
+                                                  media_dest=media_dest))
+    local("tar -cvzf {backup_dir}/media{timestamp}.tgz {media_dest}".format(
+            backup_dir=backup_dir,
+            media_dest=media_dest,
+            timestamp=datetime.now().strftime('%d%b%Y')))
 
 
 @cmd_category('Local only')
