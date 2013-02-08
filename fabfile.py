@@ -147,7 +147,7 @@ projtask = ftask(projdir=True, cmd_category='Project commands')
 localtask = ftask(projdir=True, apps='localhost', cmd_category='Local only')
 
 def managepy(cmd):
-    run(env.app.managepy + cmd)
+    return run(env.app.managepy + cmd)
 
 
 @cmd_category('Pre-defined App Groups')
@@ -244,6 +244,7 @@ def dumpdb(dest_file=None):
 
 
 def _dumpmedia(dest_file=None):
+    '''Not used anymore: we use rsync now'''
     if dest_file:
         managepy('dumpmedia --output {}'.format(dest_file))
     else:
@@ -252,7 +253,9 @@ def _dumpmedia(dest_file=None):
 
 @projtask
 def dumpmedia(dest_file=None):
-    '''dump site_media into project-media.gz'''
+    '''dump site_media into project-media.gz
+
+    Not used anymore: we use rsync now'''
     _dumpmedia(dest_file)
 
 
@@ -260,6 +263,7 @@ def app_to_dbfilename(app):
     return '~/{}.sql.gz'.format(app.name)
 
 def app_to_mediafilename(app):
+    '''Not used anymore: we use rsync now'''
     return '~/{}-media.gz'.format(app.name)
 
 def move_and_link(src, dest):
@@ -290,17 +294,26 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
     backup_dir = '{env.backups_dir}/{env.app.name}'.format(env=env)
 
     media_dir = managepy('mediadir')
-    media_src = '{env.user}@{env.host}:{media_dir}'.format(
+    media_src = '{env.app.host}:{media_dir}'.format(
         env=env,
         media_dir=media_dir)
     media_dest = backup_dir + '/media/'
+    media_zip = '{backup_dir}/media{timestamp}.tgz'.format(
+        backup_dir=backup_dir,
+        timestamp=datetime.now().strftime('%d%b%Y'))
 
-    local("rsync {media_src} {media_dest}".format(media_src=media_src,
-                                                  media_dest=media_dest))
-    local("tar -cvzf {backup_dir}/media{timestamp}.tgz {media_dest}".format(
-            backup_dir=backup_dir,
-            media_dest=media_dest,
-            timestamp=datetime.now().strftime('%d%b%Y')))
+
+    local("rsync -avz -e ssh {media_src} {media_dest}".format(
+            media_src=media_src,
+            media_dest=media_dest))
+
+    local("tar -cvzf {media_zip} {media_dest}".format(
+            media_zip=media_zip,
+            media_dest=media_dest))
+    local("ln -f -s {media_zip} {home_zip}".format(
+            media_zip=media_zip,
+            home_zip=expanduser('~/{}-media.tgz'.format(
+                    env.app.name))))
 
 
 @cmd_category('Local only')
