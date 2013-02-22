@@ -369,7 +369,7 @@ def replacemedia(mediafile):
     run('tar -xvzf {}'.format(mediafile))
 
 def runscript_(script):
-    managepy('runscript {0}'.format(script))
+    managepy('runcmd {0}'.format(script))
 
 @projtask
 def runscript(script):
