@@ -302,12 +302,11 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
         backup_dir=backup_dir,
         timestamp=datetime.now().strftime('%d%b%Y'))
 
-
     local("rsync -avz -e ssh {media_src} {media_dest}".format(
             media_src=media_src,
             media_dest=media_dest))
 
-    local("tar -cvzf {media_zip} {media_dest}".format(
+    local("tar -cvzf {media_zip} --directory {media_dest} .".format(
             media_zip=media_zip,
             media_dest=media_dest))
     local("ln -f -s {media_zip} {home_zip}".format(
@@ -331,13 +330,10 @@ def getreplacedb(dbonly=None, mediaonly=None):
         getmediaonly()
 
     db_filename = app_to_dbfilename(env.apps[0])
-    media_filename = app_to_mediafilename(env.apps[0])
     apps('localhost')
-
     if not mediaonly:
         replacedb(db=db_filename, demo=False)
-    if not dbonly:
-        replacemedia(mediafile=media_filename)
+    # no replacemedia since we use rsync
 
 @cmd_category('Local only')
 def getreplacedbonly():
@@ -363,7 +359,9 @@ def replacedb(db, demo=None, nosync=None):
 
 @projtask
 def replacemedia(mediafile):
-    '''Replace site_media with {mediafile}.'''
+    '''Not used anymore - we use rsync
+
+    Replace site_media with {mediafile}.'''
     if not 'local' in env.app.name and not 'demo' in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
     run('tar -xvzf {}'.format(mediafile))
