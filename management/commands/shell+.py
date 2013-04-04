@@ -18,7 +18,6 @@ class Command(NoArgsCommand):
             self.ipython(imported_objects)
         except ImportError:
             import code
-            imported_objects = {}
             try: # Try activating rlcompleter, because it's handy.
                 import readline
             except ImportError:
