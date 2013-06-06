@@ -89,14 +89,14 @@ class WFApp(App):
     def home(self):
         return '/home/{0}'.format(env.user)
 
-    def __init__(self, name, host):
+    def __init__(self, name, host, python='python2.7'):
         dir = '{home}/webapps/{name}'.format(home=self.home,
                                              name=name)
         projdir = '{dir}/myproject'.format(dir=dir)
         super(WFApp, self).__init__(name=name,
                                     dir=dir,
                                     projdir=projdir,
-                                    python='python2.7')
+                                    python=python)
         self.host = 'navin@{h}.webfaction.com'.format(h=host)
 
 
