@@ -74,8 +74,8 @@ class App(object):
 from os import getcwd
 class LocalApp(App):
     def __init__(self, name='localhost', dir=getcwd(), projdir=getcwd()):
-        virtualenv = env.virtualenv
-        prefix = 'source {}/bin/activate'.format(virtualenv)
+        venv = env.virtualenv
+        prefix = 'source {}/bin/activate'.format(venv) if venv else ''
         super(LocalApp, self).__init__(name=name,
                                        dir=dir,
                                        projdir=projdir,
