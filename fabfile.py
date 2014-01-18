@@ -159,7 +159,7 @@ def all():
 @cmd_category('Local only')
 def tags():
     '''Re-build tags table for emacs'''
-    local('find . -name \*.html -o -name \*.py -o -name \*.sass | etags -')
+    local('find . -path "*migrations" -prune -o -name \*.html -print -o -name \*.py -print -o -name \*.sass -print | etags -')
 
 
 @localtask
