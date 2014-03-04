@@ -97,3 +97,10 @@ class AdditionalContextMixin(object):
         if additional_context:
             context.update(additional_context)
         return context
+
+class NextOnSuccessMixin(object):
+    def get_success_url(self):
+        next_url = self.request.GET.get('next', None)
+        if next_url:
+            return next_url
+        return super(NextOnSuccessMixin, self).get_success_url()
