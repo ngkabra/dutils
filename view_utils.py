@@ -4,6 +4,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.db import transaction
 from django.utils.decorators import method_decorator
+from django.views.generic import RedirectView
 
 class AccessMixin(object):
     """
@@ -98,9 +99,23 @@ class AdditionalContextMixin(object):
             context.update(additional_context)
         return context
 
+class NextURLMixin(object):
+    def get_next_url(self, request):
+        return request.GET.get('next', None)
+
+
 class NextOnSuccessMixin(object):
+    '''Use with FormView and descendents'''
     def get_success_url(self):
-        next_url = self.request.GET.get('next', None)
+        next_url = self.get_next_url(self.request)
         if next_url:
             return next_url
         return super(NextOnSuccessMixin, self).get_success_url()
+
+class ActionAndRedirectToNextView(NextURLMixin, RedirectView):
+    '''self.action is the action, and 'next' param is the redirect'''
+    def get(self, request, *a, **kw):
+        self.action()
+        self.url = self.get_next_url(self.request) or '/'
+        return super(ActionAndRedirectToNextView,
+                     self).get(request, *a, **kw)
