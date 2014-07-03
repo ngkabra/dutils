@@ -6,9 +6,11 @@ Load settings is fake, because we do not load django.
 We do not load django because the database might not be uptodate.
 
 Drop the database and recreate it so db is clean.
-After loading, truncate the enotify table to prevent notifications
 from being sent.
 '''
+
+import logging
+logger = logging.getLogger(__name__)
 
 import argparse
 from os.path import dirname, exists, expanduser
@@ -31,6 +33,7 @@ def replace_db(dbfile):
                 break
         else:
             raise Exception('{} not found'.format(dbfile))
+    logger.debug('Replacing db from {}'.format(dbfile))
 
     db = settings.DATABASES['default']
 
@@ -40,14 +43,17 @@ def replace_db(dbfile):
 
 
     # drop and recreate database
+    logger.debug('mysql connect {}'.format(db['NAME']))
     rootdb = mysql.connect(user=db['NAME'],
                            passwd=db['PASSWORD'])
     c = rootdb.cursor()
     try:
         c.execute('drop database %s' % db['NAME'])
+        logger.debug('Dropped database {}'.format(db['NAME']))
     except:
         pass                              # ignore drop database errors
     c.execute('create database %s character set utf8 collate utf8_general_ci' % db['NAME'])
+    logger.debug('Created database {}'.format(db['NAME']))
     c.close()
     rootdb.close()
 
@@ -61,18 +67,24 @@ def replace_db(dbfile):
                                   db['NAME']],
                                  stdin=unzipproc.stdout, stdout=subprocess.PIPE)
     unzipproc.stdout.close()
+    logger.debug('Waiting for gunzip|mysql process')
     mysqlproc.wait()
 
 
-    # truncate the notifications
+    # notifications_TODO: truncate the notifications
     # mydb = mysql.connect(user=db['USER'],
     #                     passwd=db['PASSWORD'],
     #                     db=db['NAME'])
     # mydb.cursor().execute('truncate table wcomments_enotify')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--demo', action='store_true',
+parser.add_argument('-D', '--demo', action='store_true',
                     help='Prep db for demo after loading')
+parser.add_argument('-d', '--debug', action='store_true',
+                    help='log debug messages to stderr')
+parser.add_argument('-v', '--verbose',
+                    action='store_true',
+                    help='log messages to console')
 parser.add_argument('file', help='Dump of database')
 parser.add_argument('-f', '--fixdemoscript',
                     default='scripts.pyfixtures.fix_demo',
@@ -80,7 +92,23 @@ parser.add_argument('-f', '--fixdemoscript',
 parser.add_argument('-n', '--no-syncdb',
                     action='store_true',
                     help='dont do syncdb or migrate')
+
 args = parser.parse_args()
+from os.path import expanduser
+from logging.config import fileConfig
+handlers = 'console,file' if args.verbose else 'file'
+fileConfig(expanduser('~/.pylog.cfg'),
+           defaults=dict(
+               logfile=expanduser('~/logs/replacedb.log'),
+               root_handlers=handlers,
+           ),
+           disable_existing_loggers=False)
+
+if args.debug:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
+
 
 replace_db(args.file)
 
