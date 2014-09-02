@@ -99,6 +99,7 @@ class AdditionalContextMixin(object):
             context.update(additional_context)
         return context
 
+
 class NextURLMixin(object):
     def get_next_url(self, request):
         return request.GET.get('next', None)
@@ -111,6 +112,7 @@ class NextOnSuccessMixin(object):
         if next_url:
             return next_url
         return super(NextOnSuccessMixin, self).get_success_url()
+
 
 class ActionAndRedirectToNextView(NextURLMixin, RedirectView):
     '''self.action is the action, and 'next' param is the redirect'''
