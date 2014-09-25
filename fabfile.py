@@ -31,6 +31,7 @@ in <LOCAL>/fabfile.py:
   from fabric.api import env
   env.virtualenv = '~/.v/p27' # without trailing slash
   env.backups_dir = '~/Backups/websites' # without trailing slash
+  env.new_migrations = True # for django1.7 or above
 
 # Things that just work, if right things are installed
 tags,
@@ -401,7 +402,12 @@ def _migrate(apps=''):
     managepy('migrate -v 0 {}'.format(apps))
 
 def _syncdb():
-    managepy('syncdb')
+    '''Don't run syncdb if we are on django1.7 or above'''
+    try:
+        if env.new_migrations:
+            pass
+    except AttributeError:
+        managepy('syncdb')
 
 @projtask
 def syncdb():
