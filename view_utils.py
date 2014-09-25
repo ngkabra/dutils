@@ -99,6 +99,7 @@ class AdditionalContextMixin(object):
             context.update(additional_context)
         return context
 
+
 class NextURLMixin(object):
     def get_next_url(self, request):
         return request.GET.get('next', None)
