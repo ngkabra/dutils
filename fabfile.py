@@ -89,10 +89,13 @@ class WFApp(App):
     def home(self):
         return '/home/{0}'.format(env.user)
 
-    def __init__(self, name, host, python='python2.7'):
+    def __init__(self, name, host, 
+                 proj_subdir='myproject',
+                 python='python2.7'):
         dir = '{home}/webapps/{name}'.format(home=self.home,
                                              name=name)
-        projdir = '{dir}/myproject'.format(dir=dir)
+        projdir = '{dir}/{subdir}'.format(dir=dir,
+                                          subdir=proj_subdir)
         super(WFApp, self).__init__(name=name,
                                     dir=dir,
                                     projdir=projdir,

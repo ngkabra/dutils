@@ -90,7 +90,7 @@ class AdditionalContextMixin(object):
     to the results of get_context_data
     '''
     def get_additional_context(self, **kwargs):
-        return None
+        return {}
 
     def get_context_data(self, **kwargs):
         context = super(AdditionalContextMixin, self).get_context_data(**kwargs)
@@ -112,10 +112,15 @@ class NextOnSuccessMixin(object):
             return next_url
         return super(NextOnSuccessMixin, self).get_success_url()
 
-class ActionAndRedirectToNextView(NextURLMixin, RedirectView):
-    '''self.action is the action, and 'next' param is the redirect'''
+
+class ActionAndRedirectView(RedirectView):
+    '''do self.action and redirect to self.url or self.get_redirect_url'''
     def get(self, request, *a, **kw):
         self.action()
-        self.url = self.get_next_url(self.request) or '/'
-        return super(ActionAndRedirectToNextView,
-                     self).get(request, *a, **kw)
+        return super(ActionAndRedirectView, self).get(request, *a, **kw)
+
+
+class ActionAndRedirectToNextView(NextURLMixin, ActionAndRedirectView):
+    '''self.action is the action, and 'next' param is the redirect'''
+    def get_redirect_url(self):
+        return self.get_next_url(self.request) or '/'
