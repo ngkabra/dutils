@@ -1,0 +1,13 @@
+{# panel_id and panel_title and panel_body must be passed in #}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a data-toggle="collapse" data-parent="#{{groupid}}"
+             href="#{{panelid}}">
+            {{panel_title}}
+          </a>
+        </h4>
+      </div>
+      <div id="{{panelid}}" 
+           class="panel-collapse collapse {% if in_opt %}in{% endif %}">
+        <div class="panel-body">
