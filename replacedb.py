@@ -13,16 +13,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 import argparse
-from os.path import dirname, exists, expanduser
+import os
+from os.path import dirname, exists, expanduser, join
 import sys
 import subprocess
 import MySQLdb as mysql
 
-# first set path appropriately so settings can be loaded
-topdir = dirname(dirname(__file__))
-sys.path.insert(0, topdir)
 
-import settings
 
 def replace_db(dbfile):
     if not exists(expanduser(dbfile)):
@@ -82,16 +79,20 @@ parser.add_argument('-D', '--demo', action='store_true',
                     help='Prep db for demo after loading')
 parser.add_argument('-d', '--debug', action='store_true',
                     help='log debug messages to stderr')
-parser.add_argument('-v', '--verbose',
-                    action='store_true',
+parser.add_argument('-p', '--project-path', nargs='*',
+                    help='directories to add to project path')
+parser.add_argument('-s', '--settings-module', 
+                    default='settings',
+                    help='settings for DJANGO_SETTINGS_MODULE')
+parser.add_argument('-v', '--verbose', action='store_true',
                     help='log messages to console')
-parser.add_argument('file', help='Dump of database')
 parser.add_argument('-f', '--fixdemoscript',
                     default='scripts.pyfixtures.fix_demo',
                     help='dotted path for fix_demo script')
 parser.add_argument('-n', '--no-syncdb',
                     action='store_true',
                     help='dont do syncdb or migrate')
+parser.add_argument('file', help='Dump of database')
 
 args = parser.parse_args()
 from os.path import expanduser
@@ -110,10 +111,14 @@ else:
     logger.setLevel(logging.INFO)
 
 
-replace_db(args.file)
+for path_el in args.project_path[::-1]:
+    sys.path.insert(0, path_el)  # insert in reverse order to get correct order
+if args.settings_module:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', args.settings_module)
+from django.conf import settings
+from django.core.management import ManagementUtility
 
-from django.core.management import setup_environ, ManagementUtility
-setup_environ(settings)
+replace_db(args.file)
 
 if args.no_syncdb:
     cmds = []

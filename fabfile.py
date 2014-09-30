@@ -45,7 +45,7 @@ import inspect
 from datetime import datetime
 from functools import wraps
 from itertools import chain
-from os.path import expanduser, lexists
+from os.path import expanduser, lexists, join, dirname
 from shutil import move
 from os import symlink, remove
 import re
@@ -350,16 +350,26 @@ def getreplacedball():
     getreplacedb(dbonly=True)
 
 
-
 @projtask
 def replacedb(db, demo=None, nosync=None):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if not 'local' in env.app.name and not 'demo' in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
-    run(env.app.python + ' dutils/replacedb.py {demo} {nosync} {db}'.format(
-        demo='-d' if demo else '',
-        nosync='-n' if nosync else '',
-        db=db))
+    replacedb_path = join(dirname(__file__), 'replacedb.py')
+    args = ''
+    if env.project_path:
+        args += ' -p ' + ' '.join(env.project_path)
+    if env.django_settings_module:
+        args += ' -s ' + env.django_settings_module
+    if demo:
+        args += ' -D'
+    if nosync:
+        args += ' -n'
+    args += ' -- ' + db
+    run('{python} {replacedb} {args}'.format(python=env.app.python,
+                                             replacedb=replacedb_path,
+                                             args=args))
+
 
 @projtask
 def replacemedia(mediafile):
