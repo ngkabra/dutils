@@ -167,9 +167,13 @@ def tags():
 
 
 @localtask
-def findmigs(appname):
+def findmigs(appname=''):
     '''schemamigration --auto for given {appname}'''
-    managepy('schemamigration {0} --auto'.format(appname))
+    if env.new_migrations:
+        managepy('makemigrations {}'.format(appname))
+    else:
+        managepy('schemamigration {0} --auto'.format(appname))
+
 
 def compass_(dir='base/static'):
     '''Run compass compile'''
