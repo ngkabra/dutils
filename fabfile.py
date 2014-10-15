@@ -31,6 +31,7 @@ in <LOCAL>/fabfile.py:
   from fabric.api import env
   env.virtualenv = '~/.v/p27' # without trailing slash
   env.backups_dir = '~/Backups/websites' # without trailing slash
+  env.new_migrations = True # for django1.7 or above
 
 # Things that just work, if right things are installed
 tags,
@@ -44,7 +45,7 @@ import inspect
 from datetime import datetime
 from functools import wraps
 from itertools import chain
-from os.path import expanduser, lexists
+from os.path import expanduser, lexists, join, dirname
 from shutil import move
 from os import symlink, remove
 import re
@@ -89,10 +90,13 @@ class WFApp(App):
     def home(self):
         return '/home/{0}'.format(env.user)
 
-    def __init__(self, name, host, python='python2.7'):
+    def __init__(self, name, host, 
+                 proj_subdir='myproject',
+                 python='python2.7'):
         dir = '{home}/webapps/{name}'.format(home=self.home,
                                              name=name)
-        projdir = '{dir}/myproject'.format(dir=dir)
+        projdir = '{dir}/{subdir}'.format(dir=dir,
+                                          subdir=proj_subdir)
         super(WFApp, self).__init__(name=name,
                                     dir=dir,
                                     projdir=projdir,
@@ -163,9 +167,13 @@ def tags():
 
 
 @localtask
-def findmigs(appname):
+def findmigs(appname=''):
     '''schemamigration --auto for given {appname}'''
-    managepy('schemamigration {0} --auto'.format(appname))
+    if env.new_migrations:
+        managepy('makemigrations {}'.format(appname))
+    else:
+        managepy('schemamigration {0} --auto'.format(appname))
+
 
 def compass_(dir='base/static'):
     '''Run compass compile'''
@@ -348,16 +356,26 @@ def getreplacedball():
     getreplacedb(dbonly=True)
 
 
-
 @projtask
 def replacedb(db, demo=None, nosync=None):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if not 'local' in env.app.name and not 'demo' in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
-    run(env.app.python + ' dutils/replacedb.py {demo} {nosync} {db}'.format(
-        demo='-d' if demo else '',
-        nosync='-n' if nosync else '',
-        db=db))
+    replacedb_path = join(dirname(__file__), 'replacedb.py')
+    args = ''
+    if env.project_path:
+        args += ' -p ' + ' '.join(env.project_path)
+    if env.django_settings_module:
+        args += ' -s ' + env.django_settings_module
+    if demo:
+        args += ' -D'
+    if nosync:
+        args += ' -n'
+    args += ' -- ' + db
+    run('{python} {replacedb} {args}'.format(python=env.app.python,
+                                             replacedb=replacedb_path,
+                                             args=args))
+
 
 @projtask
 def replacemedia(mediafile):
@@ -400,7 +418,12 @@ def _migrate(apps=''):
     managepy('migrate -v 0 {}'.format(apps))
 
 def _syncdb():
-    managepy('syncdb')
+    '''Don't run syncdb if we are on django1.7 or above'''
+    try:
+        if env.new_migrations:
+            pass
+    except AttributeError:
+        managepy('syncdb')
 
 @projtask
 def syncdb():
