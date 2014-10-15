@@ -419,11 +419,9 @@ def _migrate(apps=''):
 
 def _syncdb():
     '''Don't run syncdb if we are on django1.7 or above'''
-    try:
-        if env.new_migrations:
-            pass
-    except AttributeError:
+    if not env.new_migrations:
         managepy('syncdb')
+
 
 @projtask
 def syncdb():
