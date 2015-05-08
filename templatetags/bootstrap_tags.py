@@ -38,9 +38,10 @@ class AccordionPanelNode(template.Node):
         self.nodelist = nodelist
 
     def render(self, context):
+        in_opt = context.get(self.in_opt) or self.in_opt.lower() == 'in'
         inner_context = dict(panelid=self.panelid,
                              panel_title=self.panel_title,
-                             in_opt=self.in_opt)
+                             in_opt=in_opt)
         return (render_to_string('bootstrap/accordion_panel_begin.html',
                                  inner_context) +
                 self.nodelist.render(context) + 
@@ -57,7 +58,7 @@ def accordionpanel(parser, token):
             "'accordiongroup' tag requires 3 or 4 arguments.")
     panelid = args[1]
     panel_title = args[2]
-    in_opt = len(args) == 4
+    in_opt = args[3] if len(args) == 4 else ''
     nodelist = parser.parse(('endaccordionpanel',))
     parser.delete_first_token()
     return AccordionPanelNode(panelid, panel_title, in_opt, nodelist)
