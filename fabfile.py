@@ -317,6 +317,8 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
     local("tar -cvzf {media_zip} --directory {media_dest} .".format(
             media_zip=media_zip,
             media_dest=media_dest))
+    local("rm -rf site_media")
+    local("ln -s {}site_media/ site_media".format(media_dest))
     local("ln -f -s {media_zip} {home_zip}".format(
             media_zip=media_zip,
             home_zip=expanduser('~/{}-media.tgz'.format(
@@ -417,11 +419,9 @@ def _migrate(apps=''):
 
 def _syncdb():
     '''Don't run syncdb if we are on django1.7 or above'''
-    try:
-        if env.new_migrations:
-            pass
-    except AttributeError:
+    if not env.new_migrations:
         managepy('syncdb')
+
 
 @projtask
 def syncdb():

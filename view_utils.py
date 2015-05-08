@@ -132,5 +132,5 @@ class ActionAndRedirectView(RedirectView):
 
 class ActionAndRedirectToNextView(NextURLMixin, ActionAndRedirectView):
     '''self.action is the action, and 'next' param is the redirect'''
-    def get_redirect_url(self):
+    def get_redirect_url(self, *args, **kwargs):
         return self.get_next_url(self.request) or '/'
