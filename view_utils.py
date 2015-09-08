@@ -65,13 +65,22 @@ class UserPassesTestMixin(AccessMixin):
                                                          *args,
                                                          **kwargs)
 
+
 class LoginRequiredMixin(UserPassesTestMixin):
     def user_passes_test(self, user):
         return user.is_authenticated()
 
+
 class StaffRequiredMixin(UserPassesTestMixin):
     def user_passes_test(self, user):
         return user.is_staff
+
+
+class UserHasPermissionMixin(UserPassesTestMixin):
+    permission = None
+    def user_passes_test(self, user):
+        return user.has_perm(self.permission)
+
 
 class CommitOnSuccessMixin(object):
     '''
