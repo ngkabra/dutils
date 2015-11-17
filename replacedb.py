@@ -24,7 +24,7 @@ import MySQLdb as mysql
 def replace_db(dbfile):
     if not exists(expanduser(dbfile)):
         for f in (expanduser(dbfile) + '.sql.gz',
-                  expanduser('~/' + dbfile + '.sql.gz')):
+                  expanduser('~/u/' + dbfile + '.sql.gz')):
             if exists(f):
                 dbfile = f
                 break
