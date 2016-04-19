@@ -6,13 +6,14 @@ from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.views.generic import RedirectView
 
+
 class AccessMixin(object):
     """
     'Abstract' mixin that gives access mixins the same customizable
     functionality.
     """
-    login_url = settings.LOGIN_URL # LOGIN_URL from project settings
-    raise_exception = False # Default whether to raise an exception to none
+    login_url = settings.LOGIN_URL  # LOGIN_URL from project settings
+    raise_exception = False  # Default whether to raise an exception to none
     redirect_field_name = REDIRECT_FIELD_NAME
 
     def get_login_url(self):
@@ -92,6 +93,7 @@ class CommitOnSuccessMixin(object):
                                                           *args,
                                                           **kwargs)
 
+
 class AdditionalContextMixin(object):
     '''All `get_additional_context` to return additional context
 
@@ -102,7 +104,8 @@ class AdditionalContextMixin(object):
         return {}
 
     def get_context_data(self, **kwargs):
-        context = super(AdditionalContextMixin, self).get_context_data(**kwargs)
+        context = super(AdditionalContextMixin, 
+                        self).get_context_data(**kwargs)
         additional_context = self.get_additional_context(**kwargs)
         if additional_context:
             context.update(additional_context)
