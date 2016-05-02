@@ -114,7 +114,7 @@ class AdditionalContextMixin(object):
 
 class NextURLMixin(object):
     def get_next_url(self, request):
-        return request.GET.get('next', None)
+        return request.GET.get('next', request.POST.get('next', None))
 
 
 class NextOnSuccessMixin(object):
