@@ -13,6 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import argparse
+from datetime import datetime
 import os
 from os.path import dirname, exists, expanduser, join
 import sys
@@ -24,7 +25,7 @@ import MySQLdb as mysql
 def replace_db(dbfile):
     if not exists(expanduser(dbfile)):
         for f in (expanduser(dbfile) + '.sql.gz',
-                  expanduser('~/' + dbfile + '.sql.gz')):
+                  expanduser('~/u/' + dbfile + '.sql.gz')):
             if exists(f):
                 dbfile = f
                 break
@@ -55,6 +56,7 @@ def replace_db(dbfile):
     rootdb.close()
 
 
+    logger.info('replacedb started at {0:%H:%M:%S}'.format(datetime.now()))
     # now load the data. For that first gunzip it,
     # then run mysql in a subprocess
     unzipproc = subprocess.Popen(['gunzip', '--stdout', dbfile],

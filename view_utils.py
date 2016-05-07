@@ -14,6 +14,7 @@ except ImportError:
     commit_on_success = identity_decorator
 
 
+
 class AccessMixin(object):
     """
     'Abstract' mixin that gives access mixins the same customizable
@@ -126,7 +127,7 @@ class AdditionalContextMixin(object):
 
 class NextURLMixin(object):
     def get_next_url(self, request):
-        return request.GET.get('next', None)
+        return request.GET.get('next', request.POST.get('next', None))
 
 
 class NextOnSuccessMixin(object):
@@ -153,5 +154,6 @@ class ActionAndRedirectToNextView(NextURLMixin, ActionAndRedirectView):
 
 class TemplateViewWithExtraContext(AdditionalContextMixin, TemplateView):
     extra_context = {}
+
     def get_additional_context(self):
         return self.kwargs('extra_context')

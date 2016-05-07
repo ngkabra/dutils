@@ -268,11 +268,11 @@ def dumpmedia(dest_file=None):
 
 
 def app_to_dbfilename(app):
-    return '~/{}.sql.gz'.format(app.name)
+    return '~/u/{}.sql.gz'.format(app.name)
 
 def app_to_mediafilename(app):
     '''Not used anymore: we use rsync now'''
-    return '~/{}-media.gz'.format(app.name)
+    return '~/u/{}-media.gz'.format(app.name)
 
 def move_and_link(src, dest):
     move(src, dest)
@@ -321,7 +321,7 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
     local("ln -s {}site_media/ site_media".format(media_dest))
     local("ln -f -s {media_zip} {home_zip}".format(
             media_zip=media_zip,
-            home_zip=expanduser('~/{}-media.tgz'.format(
+            home_zip=expanduser('~/u/{}-media.tgz'.format(
                     env.app.name))))
 
 
@@ -357,7 +357,7 @@ def getreplacedball():
 
 
 @projtask
-def replacedb(db, demo=None, nosync=None):
+def replacedb(db, demo=None, nosync=None, verbose=None):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if not 'local' in env.app.name and not 'demo' in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
