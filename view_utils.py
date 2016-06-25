@@ -57,9 +57,10 @@ class UserPassesTestMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not self.user_passes_test(request.user):
             if self.raise_exception:
-                raise PermissionDenied # return a forbidden response
+                raise PermissionDenied  # return a forbidden response
             else:
-                return redirect_to_login(request.get_full_path(),
+                return redirect_to_login(
+                    request.get_full_path(),
                     self.get_login_url(), self.get_redirect_field_name())
 
         return super(UserPassesTestMixin, self).dispatch(request,
@@ -104,7 +105,7 @@ class AdditionalContextMixin(object):
         return {}
 
     def get_context_data(self, **kwargs):
-        context = super(AdditionalContextMixin, 
+        context = super(AdditionalContextMixin,
                         self).get_context_data(**kwargs)
         additional_context = self.get_additional_context(**kwargs)
         if additional_context:
