@@ -14,7 +14,6 @@ except ImportError:
     commit_on_success = identity_decorator
 
 
-
 class AccessMixin(object):
     """
     'Abstract' mixin that gives access mixins the same customizable
