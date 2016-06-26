@@ -72,7 +72,6 @@ class UserPassesTestMixin(AccessMixin):
                     request.get_full_path(),
                     self.get_login_url(),
                     self.get_redirect_field_name())
-
         return super(UserPassesTestMixin, self).dispatch(request,
                                                          *args,
                                                          **kwargs)
