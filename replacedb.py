@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 '''Replace the database with a dump
 
@@ -63,7 +64,7 @@ def replace_db(dbfile):
                                  stdout=subprocess.PIPE)
     mysqlproc = subprocess.Popen(
         ['mysql', '-u', db['USER'],
-         '--password=%s' % (db['PASSWORD'],),
+         '--password={}'.format(db['PASSWORD'],),
          db['NAME']],
         stdin=unzipproc.stdout, stdout=subprocess.PIPE)
     unzipproc.stdout.close()
