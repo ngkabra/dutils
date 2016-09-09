@@ -10,7 +10,6 @@ except ImportError:
     sendgrid = None
 
 
-
 class MailError(Exception):
     pass
 
