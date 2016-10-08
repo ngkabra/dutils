@@ -75,7 +75,7 @@ class App(object):
 from os import getcwd
 class LocalApp(App):
     def __init__(self, name='localhost', dir=getcwd(), projdir=getcwd()):
-        venv = env.virtualenv
+        venv = env.local_virtualenv
         prefix = 'source {}/bin/activate'.format(venv) if venv else ''
         super(LocalApp, self).__init__(name=name,
                                        dir=dir,
@@ -90,7 +90,7 @@ class WFApp(App):
     def home(self):
         return '/home/{0}'.format(env.user)
 
-    def __init__(self, name, host, 
+    def __init__(self, name, host,
                  proj_subdir='myproject',
                  python='python2.7'):
         dir = '{home}/webapps/{name}'.format(home=self.home,
