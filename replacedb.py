@@ -9,11 +9,16 @@ Drop the database and recreate it so db is clean.
 from being sent.
 '''
 import argparse
+from datetime import datetime
 import os
 from os.path import exists, expanduser
 import sys
 import subprocess
 import MySQLdb as mysql
+from logging.config import fileConfig
+import django
+from django.conf import settings
+from django.core.management import execute_from_command_line
 
 import logging
 logger = logging.getLogger(__name__)
@@ -52,13 +57,14 @@ def replace_db(dbfile):
     c.close()
     rootdb.close()
 
+    logger.info('replacedb started at {0:%H:%M:%S}'.format(datetime.now()))
     # now load the data. For that first gunzip it,
     # then run mysql in a subprocess
     unzipproc = subprocess.Popen(['gunzip', '--stdout', dbfile],
                                  stdout=subprocess.PIPE)
     mysqlproc = subprocess.Popen(
         ['mysql', '-u', db['USER'],
-         '--password=%s' % (db['PASSWORD'],),
+         '--password={}'.format(db['PASSWORD'],),
          db['NAME']],
         stdin=unzipproc.stdout, stdout=subprocess.PIPE)
     unzipproc.stdout.close()
@@ -92,8 +98,6 @@ parser.add_argument('-n', '--no-syncdb',
 parser.add_argument('file', help='Dump of database')
 
 args = parser.parse_args()
-from os.path import expanduser
-from logging.config import fileConfig
 handlers = 'console,file' if args.verbose else 'file'
 fileConfig(expanduser('~/.pylog.cfg'),
            defaults=dict(
@@ -112,13 +116,14 @@ for path_el in args.project_path[::-1]:
     sys.path.insert(0, path_el)  # insert in reverse order to get correct order
 if args.settings_module:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', args.settings_module)
-from django.conf import settings
-from django.core.management import execute_from_command_line
 
 replace_db(args.file)
 
 if args.no_syncdb:
     cmds = []
+elif django.VERSION[0] > 1 or django.VERSION[1] >= 9:
+    # no syncdb in django 1.9 or above
+    cmds = [['migrate']]
 else:
     cmds = [['syncdb'], ['migrate']]
 
