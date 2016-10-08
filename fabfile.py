@@ -48,13 +48,14 @@ from itertools import chain
 from os.path import expanduser, lexists, join, dirname
 from shutil import move
 from os import symlink, remove
+from os import getcwd
 import re
 import sys
-
 
 from fabric.api import *
 
 # see below for default value of env.apps
+
 
 class App(object):
     def __init__(self, name, dir, projdir, python='python', prefix=None):
@@ -72,7 +73,6 @@ class App(object):
                                              dir=self.dir)
 
 
-from os import getcwd
 class LocalApp(App):
     def __init__(self, name='localhost', dir=getcwd(), projdir=getcwd()):
         venv = env.virtualenv
@@ -90,7 +90,7 @@ class WFApp(App):
     def home(self):
         return '/home/{0}'.format(env.user)
 
-    def __init__(self, name, host, 
+    def __init__(self, name, host,
                  proj_subdir='myproject',
                  python='python2.7'):
         dir = '{home}/webapps/{name}'.format(home=self.home,
@@ -104,7 +104,7 @@ class WFApp(App):
         self.host = 'navin@{h}.webfaction.com'.format(h=host)
 
 
-APPMAP=dict(
+APPMAP = dict(
     localhost=[LocalApp()],
     ALL=['localhost', 'remote'],
     local=['localhost'],
@@ -140,6 +140,7 @@ def ftask(projdir=False, apps=None, cmd_category=None):
         return wrapper
     return dec
 
+
 def cmd_category(cat):
     def dec(f):
         f.cmd_category = cat
@@ -149,6 +150,7 @@ def cmd_category(cat):
 wftask = ftask(cmd_category='Server commands')
 projtask = ftask(projdir=True, cmd_category='Project commands')
 localtask = ftask(projdir=True, apps='localhost', cmd_category='Local only')
+
 
 def managepy(cmd):
     return run(env.app.managepy + cmd)
@@ -163,7 +165,8 @@ def all():
 @cmd_category('Local only')
 def tags():
     '''Re-build tags table for emacs'''
-    local('find . -path "*migrations" -prune -o -name \*.html -print -o -name \*.py -print -o -name \*.sass -print | etags -')
+    local('find . -path "*migrations" -prune -o -name \*.html '
+          '-print -o -name \*.py -print -o -name \*.sass -print | etags -')
 
 
 @localtask
@@ -205,9 +208,11 @@ def nose_opts():
         return []
     return ['--with-stopwatch']
 
+
 def test_cmd():
     '''Test command'''
     return 'test ' + ' '.join(nose_opts())
+
 
 @projtask
 def testfailed(options=''):
@@ -220,11 +225,13 @@ def test(options=''):
     '''run managepy test with {options}'''
     managepy('{} {}'.format(test_cmd(), options))
 
+
 @projtask
 def quicktest(seconds=5):
     '''run only tests faster than seconds seconds'''
     managepy('{cmd} --faster-than{seconds} {opts}'.format(cmd=test_cmd(),
                                                           seconds=seconds))
+
 
 @projtask
 def shell():
@@ -270,9 +277,11 @@ def dumpmedia(dest_file=None):
 def app_to_dbfilename(app):
     return '~/u/{}.sql.gz'.format(app.name)
 
+
 def app_to_mediafilename(app):
     '''Not used anymore: we use rsync now'''
     return '~/u/{}-media.gz'.format(app.name)
+
 
 def move_and_link(src, dest):
     move(src, dest)
@@ -295,6 +304,7 @@ def getdbonly(db_dest_file=None):
                           env.backups_dir,
                           env.app.name,
                           datetime.now().strftime('%d%b%Y'))))
+
 
 @projtask
 def getmediaonly(db_dest_file=None, media_dest_file=None):
@@ -345,10 +355,12 @@ def getreplacedb(dbonly=None, mediaonly=None):
         replacedb(db=db_filename, demo=False)
     # no replacemedia since we use rsync
 
+
 @cmd_category('Local only')
 def getreplacedbonly():
     '''Get db (no media) and replace'''
     getreplacedb(dbonly=True)
+
 
 @cmd_category('Local only')
 def getreplacedball():
@@ -359,7 +371,7 @@ def getreplacedball():
 @projtask
 def replacedb(db, demo=None, nosync=None, verbose=None):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
-    if not 'local' in env.app.name and not 'demo' in env.app.name:
+    if 'local' not in env.app.name and 'demo' not in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
     replacedb_path = join(dirname(__file__), 'replacedb.py')
     args = ''
@@ -382,17 +394,20 @@ def replacemedia(mediafile):
     '''Not used anymore - we use rsync
 
     Replace site_media with {mediafile}.'''
-    if not 'local' in env.app.name and not 'demo' in env.app.name:
+    if 'local' not in env.app.name and 'demo' not in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
     run('tar -xvzf {}'.format(mediafile))
 
+
 def runscript_(script):
     managepy('runcmd {0}'.format(script))
+
 
 @projtask
 def runscript(script):
     '''manage.py runscript {script}'''
     runscript_(script)
+
 
 @projtask
 def push():
@@ -403,8 +418,10 @@ def push():
 def _pull():
     run('git pull')
 
+
 def _submodule_update():
     run('git submodule update')
+
 
 @projtask
 def fakeinit_migs():
@@ -413,9 +430,11 @@ def fakeinit_migs():
     execute(_submodule_update)
     managepy('runcmd scripts.resetmigs fakeinit_migs')
 
+
 def _migrate(apps=''):
     '''Here, apps are django apps, not fab apps'''
     managepy('migrate -v 0 {}'.format(apps))
+
 
 def _syncdb():
     '''Don't run syncdb if we are on django1.7 or above'''
@@ -473,6 +492,7 @@ def upgrade():
     execute(_migrate)
     execute(_media)
     execute(_restart)
+
 
 @projtask
 def cmd(c):
