@@ -201,6 +201,14 @@ def serve():
     managepy('runserver_plus')
 
 
+def nose_opts():
+    try:
+        import pinocchio
+    except ImportError:
+        return []
+    return ['--with-stopwatch']
+
+
 def test_cmd():
     '''Test command'''
     return 'test ' + ' '.join(nose_opts())

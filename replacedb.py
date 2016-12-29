@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 '''Replace the database with a dump
 
@@ -19,7 +18,7 @@ import MySQLdb as mysql
 from logging.config import fileConfig
 import django
 from django.conf import settings
-from django.core.management import ManagementUtility
+from django.core.management import execute_from_command_line
 
 import logging
 logger = logging.getLogger(__name__)
@@ -52,7 +51,8 @@ def replace_db(dbfile):
         logger.debug('Dropped database {}'.format(db['NAME']))
     except:
         pass                              # ignore drop database errors
-    c.execute('create database {} character set utf8 collate utf8_general_ci'.format(db['NAME']))
+    c.execute('create database {} character set utf8 '
+              'collate utf8_general_ci'.format(db['NAME']))
     logger.debug('Created database {}'.format(db['NAME']))
     c.close()
     rootdb.close()
@@ -130,5 +130,6 @@ else:
 if args.demo:
     cmds.append(['runcmd', args.fixdemoscript])
 for cmd in cmds:
-    utility = ManagementUtility([sys.argv[0]] + cmd)
-    utility.execute()
+    execute_from_command_line([sys.argv[0]] + cmd)
+    # utility = ManagementUtility([sys.argv[0]] + cmd)
+    # utility.execute()
