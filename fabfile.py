@@ -247,7 +247,7 @@ def dbshell():
 
 def _dumpdb(dest_file=None):
     if dest_file:
-        managepy('dumpdb --output {}'.format(dest_file))
+        managepy('dumpdb --output={}'.format(dest_file))
     else:
         managepy('dumpdb')
 
