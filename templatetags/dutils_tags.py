@@ -24,3 +24,12 @@ def dmarkdownh(content):
     '''Markdown with codehilite'''
     return mark_safe(markdown(content,
                               extensions=['codehilite(guess_lang=False)']))
+
+
+@register.filter
+@stringfilter
+def chop_markdown(content):
+    content = content.strip()
+    if content[:3].lower() == '<p>' and content[-4:] == '</p>':
+        content = content[3:-4]
+    return mark_safe(content)
