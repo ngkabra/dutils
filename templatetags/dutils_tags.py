@@ -2,8 +2,18 @@ from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from markdown import markdown
+import random
 
 register = template.Library()
+
+
+@register.filter
+@stringfilter
+def random_choice(choices):
+    '''Randomly choose one of the choices and return it
+
+    Choices is a comma separated string (for now)'''
+    return random.choice([c.strip() for c in choices.split(',')])
 
 
 @register.filter
