@@ -22,5 +22,6 @@ def dmarkdown(content):
 @stringfilter
 def dmarkdownh(content):
     '''Markdown with codehilite'''
-    return mark_safe(markdown(content,
-                              extensions=['codehilite(guess_lang=False)']))
+    return mark_safe(markdown(
+        content,
+        extensions=['markdown.extensions.codehilite(guess_lang=False)']))
