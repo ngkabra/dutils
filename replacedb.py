@@ -75,7 +75,6 @@ def replace_db(dbfile):
     # mydb = mysql.connect(user=db['USER'],
     #                     passwd=db['PASSWORD'],
     #                     db=db['NAME'])
-    # mydb.cursor().execute('truncate table wcomments_enotify')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-D', '--demo', action='store_true',
