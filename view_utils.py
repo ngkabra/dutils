@@ -97,6 +97,7 @@ class UserHasPermissionMixin(UserPassesTestMixin):
 class CommitOnSuccessMixin(object):
     '''
     View mixin to commit transaction on success
+    Not really required for Django1.6+
     '''
     @method_decorator(commit_on_success)
     def dispatch(self, request, *args, **kwargs):
