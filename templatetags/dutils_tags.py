@@ -1,6 +1,7 @@
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
+from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown import markdown
 import random
 
@@ -34,7 +35,8 @@ def dmarkdownh(content):
     '''Markdown with codehilite'''
     return mark_safe(markdown(
         content,
-        extensions=['markdown.extensions.codehilite(guess_lang=False)']))
+        extensions=[CodeHiliteExtension(guess_lang=False)]))
+
 
 @register.filter
 @stringfilter
