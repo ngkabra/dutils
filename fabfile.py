@@ -365,7 +365,7 @@ def getreplacedbonly():
 @cmd_category('Local only')
 def getreplacedball():
     '''Get db and media and replace'''
-    getreplacedb(dbonly=True)
+    getreplacedb()
 
 
 @projtask
