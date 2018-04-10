@@ -120,8 +120,8 @@ replace_db(args.file)
 
 if args.no_syncdb:
     cmds = []
-elif django.VERSION[0] > 1 or django.VERSION[1] >= 9:
-    # no syncdb in django 1.9 or above
+elif django.VERSION[0] > 1 or django.VERSION[1] >= 7:
+    # no syncdb in django 1.7 or above
     cmds = [['migrate']]
 else:
     cmds = [['syncdb'], ['migrate']]
