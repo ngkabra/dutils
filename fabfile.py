@@ -484,12 +484,13 @@ def restart():
 
 
 @projtask
-def upgrade():
+def upgrade(nomigrate=None):
     '''pull, syncdb, migrate, media, restart.'''
     execute(_pull)
     execute(_submodule_update)
-    execute(_syncdb)
-    execute(_migrate)
+    if not nomigrate:
+        execute(_syncdb)
+        execute(_migrate)
     execute(_media)
     execute(_restart)
 
