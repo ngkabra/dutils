@@ -26,7 +26,7 @@ def sendgrid_send(subject,
     data = {
         "personalizations": [
             {
-                "to": [{"email": e} for e in to_emails],
+                "to": [{"email": e} for e in set(to_emails)],
                 "subject": subject,
             }
         ],
