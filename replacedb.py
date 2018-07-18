@@ -11,7 +11,7 @@ from being sent.
 import argparse
 from datetime import datetime
 import os
-from os.path import exists, expanduser
+from os.path import exists, expanduser, abspath
 import sys
 import subprocess
 import MySQLdb as mysql
@@ -112,13 +112,15 @@ else:
 
 
 for path_el in args.project_path[::-1]:
-    sys.path.insert(0, path_el)  # insert in reverse order to get correct order
+    sys.path.insert(0, abspath(expanduser(path_el)))
+    # insert in reverse order to get correct order
 if args.settings_module:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', args.settings_module)
 
 replace_db(args.file)
 
 if args.no_syncdb:
+    logger.info('Skipping sync commands')
     cmds = []
 elif django.VERSION[0] > 1 or django.VERSION[1] >= 7:
     # no syncdb in django 1.7 or above
@@ -129,6 +131,7 @@ else:
 if args.demo:
     cmds.append(['runcmd', args.fixdemoscript])
 for cmd in cmds:
+    logger.info('Executing: <manage.py> cmd'.format(cmd))
     execute_from_command_line([sys.argv[0]] + cmd)
     # utility = ManagementUtility([sys.argv[0]] + cmd)
     # utility.execute()
