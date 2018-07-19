@@ -167,6 +167,15 @@ def tags():
     local('find . -path "*migrations" -prune '
           '-o -name \*.html -print -o -name \*.py '
           '-print -o -name \*.sass -print | etags -')
+    local('find . -path ./autoevals -prune -path "*migrations" -prune '
+          '-o -name \*.html -print -o -name \*.py '
+          '-print -o -name \*.sass -print | etags -o TAGS_NOEVALS -')
+    local('find . -path "*migrations" -prune '
+          '-o -name \*.py '
+          '-print -o -name \*.sass -print | etags -o TAGS_NOHTML -')
+    local('find . -path ./autoevals -prune -path "*migrations" -prune '
+          '-o -name \*.py '
+          '-print -o -name \*.sass -print | etags -o TAGS_NOEVALSHTML -')
 
 
 @localtask
@@ -383,6 +392,9 @@ def replacedb(db, demo=None, nosync=None, verbose=None):
         args += ' -D'
     if nosync:
         args += ' -n'
+    if verbose:
+        args += ' -d'
+    args += ' -v'  # log to stdout
     args += ' -- ' + db
     run('{python} {replacedb} {args}'.format(python=env.app.python,
                                              replacedb=replacedb_path,
