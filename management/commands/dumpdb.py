@@ -1,4 +1,3 @@
-from optparse import make_option
 from os.path import expanduser, dirname, basename
 
 from django.core.management.base import BaseCommand
@@ -9,11 +8,13 @@ import subprocess
 
 class Command(BaseCommand):
      project_name = basename(dirname(dirname(dirname(dirname(__file__)))))
-     option_list = BaseCommand.option_list + (
-          make_option('--output',
-                      default='~/{}.sql'.format(project_name),
-                      help='output file'),)
-     def handle(self, **options):
+
+     def add_arguments(self, parser):
+          parser.add_argument('--output',
+                              default='~/{}.sql'.format(project_name),
+                              help='output file')
+
+     def handle(self, *args, **options):
           db = settings.DATABASES['default']
           outfile = expanduser(options['output'])
           if outfile.endswith('.gz'):
