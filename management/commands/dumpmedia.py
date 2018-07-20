@@ -11,9 +11,10 @@ class Command(BaseCommand):
     project_name = basename(project_root)
 
     def add_arguments(self, parser):
-        parser.add_argument('--output',
-                            default='~/{}-media.gz'.format(project_name),
-                            help='output file')
+        parser.add_argument(
+            '--output',
+            default='~/{}-media.gz'.format(Command.project_name),
+            help='output file')
         
     def handle(self, *args, **options):
         outfile = expanduser(options['output'])

@@ -8,11 +8,11 @@ import subprocess
 
 class Command(BaseCommand):
      project_name = basename(dirname(dirname(dirname(dirname(__file__)))))
-
      def add_arguments(self, parser):
-          parser.add_argument('--output',
-                              default='~/{}.sql'.format(project_name),
-                              help='output file')
+          parser.add_argument(
+               '--output',
+               default='~/{}.sql'.format(Command.project_name),
+               help='output file')
 
      def handle(self, *args, **options):
           db = settings.DATABASES['default']
