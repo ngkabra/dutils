@@ -1,9 +1,9 @@
 # Code adapted from shell.py management command in Django-1.4.3
 # Don't want django-extensions just for shell_plus
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = ("Runs a Python interactive interpreter. "
             "Tries to use IPython, if it's available.")
 
@@ -11,7 +11,7 @@ class Command(NoArgsCommand):
         from IPython import embed
         embed(user_ns=imported_objects)
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         imported_objects = {}
         try:
             from django.db.models.loading import get_models
