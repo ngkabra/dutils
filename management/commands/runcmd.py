@@ -6,7 +6,7 @@ class Command(BaseCommand):
         parser.add_argument('arguments', nargs='*')
 
     def handle(self, *args, **options):
-        script = args[0]
-        arguments = args[1:]
+        script = options['script']
+        arguments = options['arguments']
         mod = __import__(script, [], [], [' '])
         mod.run(*arguments)
