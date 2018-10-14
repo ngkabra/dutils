@@ -79,7 +79,7 @@ class UserPassesTestMixin(AccessMixin):
 
 class LoginRequiredMixin(UserPassesTestMixin):
     def user_passes_test(self, user):
-        return user.is_authenticated()
+        return user.is_authenticated
 
 
 class StaffRequiredMixin(UserPassesTestMixin):
