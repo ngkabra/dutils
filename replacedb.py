@@ -94,6 +94,8 @@ parser.add_argument('-f', '--fixdemoscript',
 parser.add_argument('-n', '--no-syncdb',
                     action='store_true',
                     help='dont do syncdb or migrate')
+parser.add_argument('-r', '--register-evaluators', action='store_true',
+                    help='register evaluators for reliscore')
 parser.add_argument('file', help='Dump of database')
 
 args = parser.parse_args()
@@ -128,10 +130,11 @@ elif django.VERSION[0] > 1 or django.VERSION[1] >= 7:
 else:
     cmds = [['syncdb'], ['migrate']]
 
+if args.register_evaluators:
+    cmds += [['register_evaluators', '-f', '-c', 'reliscore']]
+
 if args.demo:
     cmds.append(['runcmd', args.fixdemoscript])
 for cmd in cmds:
     logger.info('Executing: <manage.py> cmd'.format(cmd))
     execute_from_command_line([sys.argv[0]] + cmd)
-    # utility = ManagementUtility([sys.argv[0]] + cmd)
-    # utility.execute()
