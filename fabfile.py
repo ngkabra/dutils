@@ -165,17 +165,35 @@ def all():
 def tags():
     '''Re-build tags table for emacs'''
     local('find . -path "*migrations" -prune '
-          '-o -name \*.html -print -o -name \*.py '
-          '-print -o -name \*.sass -print | etags -')
+          '-o -name \*.html -print '
+          '-o -name \*.py -print '
+          '-o -name \*.js -print '
+          '-o -name \*.sass -print '
+          '| etags -')
     local('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.html -print -o -name \*.py '
-          '-print -o -name \*.sass -print | etags -o TAGS_NOEVALS -')
+          '-o -name \*.html -print '
+          '-o -name \*.py -print '
+          '-o -name \*.js -print '
+          '-o -name \*.sass -print '
+          '| etags -o TAGS_NOEVALS -')
     local('find . -path "*migrations" -prune '
-          '-o -name \*.py '
-          '-print -o -name \*.sass -print | etags -o TAGS_NOHTML -')
+          '-o -name \*.py -print '
+          '-o -name \*.sass -print '
+          '| etags -o TAGS_NOHTMLNOJS -')
     local('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.py '
-          '-print -o -name \*.sass -print | etags -o TAGS_NOEVALSHTML -')
+          '-o -name \*.js -print '
+          '-o -name \*.sass -print '
+          '-o -name \*.html -print '
+          '| etags -o TAGS_ONLYJSHTML -')
+    local('find . -path ./autoevals -prune -path "*migrations" -prune '
+          '-o -name \*.py -print '
+          '-o -name \*.sass -print '
+          '| etags -o TAGS_ONLYPY -')
+    local('find . -path ./autoevals -prune -path "*migrations" -prune '
+          '-o -name \*.py -print '
+          '-o -name \*.html -print '
+          '-o -name \*.sass -print '
+          '| etags -o TAGS_ONLYPYHTML -')
 
 
 @localtask
@@ -395,6 +413,7 @@ def replacedb(db, demo=None, nosync=None, verbose=None):
     if verbose:
         args += ' -d'
     args += ' -v'  # log to stdout
+    args += ' -r'  # register evaluators for reliscore
     args += ' -- ' + db
     run('{python} {replacedb} {args}'.format(python=env.app.python,
                                              replacedb=replacedb_path,
@@ -546,10 +565,10 @@ def help(func=None, cat=None):
             flist[cmd_category].append(f)
 
     for c, funcs in flist.iteritems():
-        print '{}:'.format(c)
+        print('{}:'.format(c))
         for f in funcs:
             if f.__doc__:
                 doc = f.__doc__.replace('\n', '    \n')
             else:
                 doc = 'Lazy bum. No __doc__ for {f.__name__}'.format(f=f)
-            print '    {f.__name__}: {doc}'.format(f=f, doc=doc)
+            print('    {f.__name__}: {doc}'.format(f=f, doc=doc))
