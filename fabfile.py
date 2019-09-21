@@ -519,7 +519,7 @@ def wfinstall(package):
 
 
 def help(func=None, cat=None):
-    '''Print a nice list of fab commands'''
+    '''Output a nice list of fab commands'''
     flist = defaultdict(list)
     for n, f in inspect.getmembers(sys.modules[__name__],
                                    inspect.isfunction):
@@ -532,11 +532,11 @@ def help(func=None, cat=None):
                 continue
             flist[cmd_category].append(f)
 
-    for c, funcs in flist.iteritems():
-        print '{}:'.format(c)
+    for c, funcs in flist.items():
+        print('{}:'.format(c))
         for f in funcs:
             if f.__doc__:
                 doc = f.__doc__.replace('\n', '    \n')
             else:
                 doc = 'Lazy bum. No __doc__ for {f.__name__}'.format(f=f)
-            print '    {f.__name__}: {doc}'.format(f=f, doc=doc)
+            print('    {f.__name__}: {doc}'.format(f=f, doc=doc))

@@ -1,6 +1,10 @@
 import json
 import requests
-from urllib2 import HTTPError
+try:
+    from urllib.error import HTTPError
+except:
+    # py3remove
+    from urllib.error import HTTPError
 
 from django.conf import settings
 
