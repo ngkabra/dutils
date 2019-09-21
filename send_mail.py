@@ -4,7 +4,7 @@ try:
     from urllib.error import HTTPError
 except:
     # py3remove
-    from urllib import HTTPError
+    from urllib2 import HTTPError
 
 from django.conf import settings
 
