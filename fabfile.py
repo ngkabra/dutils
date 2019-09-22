@@ -66,10 +66,14 @@ class App(object):
         self.managepy = self.python + ' manage.py '
         self.prefix = prefix
 
-    def __unicode__(self):
+    def __str__(self):
         return '{name}::{host}/{dir}'.format(name=self.name,
                                              host=self.host,
                                              dir=self.dir)
+
+    # py3remove
+    def __unicode__(self):
+        return self.__str__()
 
 
 class LocalApp(App):
