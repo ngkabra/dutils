@@ -413,7 +413,8 @@ def replacedb(db, demo=None, nosync=None, verbose=None):
     if verbose:
         args += ' -d'
     args += ' -v'  # log to stdout
-    args += ' -r'  # register evaluators for reliscore
+    # we're not doing demos anymore
+    # args += ' -r'  # register evaluators for reliscore
     args += ' -- ' + db
     run('{python} {replacedb} {args}'.format(python=env.app.python,
                                              replacedb=replacedb_path,
@@ -430,14 +431,14 @@ def replacemedia(mediafile):
     run('tar -xvzf {}'.format(mediafile))
 
 
-def runscript_(script):
+def runscript_(script, **kw):
     managepy('runcmd {0}'.format(script))
 
 
 @projtask
-def runscript(script):
+def runscript(script, **kw):
     '''manage.py runscript {script}'''
-    runscript_(script)
+    runscript_(script, **kw)
 
 
 @projtask
