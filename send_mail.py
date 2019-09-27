@@ -1,6 +1,7 @@
 import json
 import requests
-from urllib2 import HTTPError
+import urllib2
+import python_http_client
 
 from django.conf import settings
 
@@ -21,6 +22,15 @@ def sendgrid_send(subject,
                   from_email_name="RSphinx Admin",
                   cc_emails=[],
                   bcc_emails=[]):
+
+    # Validations
+    to_emails = set(e.lower() for e in to_emails)
+    if len(to_emails) + len(cc_emails) + len(bcc_emails) > 990:
+        raise MailError('Too many to_emails: {}. Break into chunks'.format(
+            len(to_emails)))
+    for e in cc_emails + bcc_emails:
+        if e.lower() in to_emails:
+            raise MailError('Email {} in cc/bcc also in to'.format(e))
 
     sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_KEY)
     data = {
@@ -50,8 +60,10 @@ def sendgrid_send(subject,
 
     try:
         response = sg.client.mail.send.post(request_body=data)
-    except HTTPError as e:
-        raise MailError('HTTPError: {}'.format(e.read()))
+    except (urllib2.HTTPError, http_client_error.HTTPError) as e:
+        raise MailError('HTTPError: {}'.format(e.body))
+    except Exception as e:
+        raise MailError('Unknown Exception: {}'.format(e.body))
 
     if response.status_code % 100 != 2:  # not 2xx
         raise MailError("status={}, body={}".format(
