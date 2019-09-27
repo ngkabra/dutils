@@ -367,7 +367,7 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
 
 
 @cmd_category('Local only')
-def getreplacedb(dbonly=None, mediaonly=None):
+def getreplacedb(dbonly=None, mediaonly=None, extra_args=''):
     '''Get db from remote replace local db. Dont fix demo'''
     if dbonly and mediaonly:
         abort('Cant specify both flags')
@@ -383,7 +383,7 @@ def getreplacedb(dbonly=None, mediaonly=None):
     db_filename = app_to_dbfilename(env.apps[0])
     apps('localhost')
     if not mediaonly:
-        replacedb(db=db_filename, demo=False)
+        replacedb(db=db_filename, demo=False, extra_args=extra_args)
     # no replacemedia since we use rsync
 
 
@@ -400,7 +400,7 @@ def getreplacedball():
 
 
 @projtask
-def replacedb(db, demo=None, nosync=None, verbose=None):
+def replacedb(db, demo=None, nosync=None, verbose=None, extra_args=''):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if 'local' not in env.app.name and 'demo' not in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
@@ -417,7 +417,7 @@ def replacedb(db, demo=None, nosync=None, verbose=None):
     if verbose:
         args += ' -d'
     args += ' -v'  # log to stdout
-    args += ' -r'  # register evaluators for reliscore
+    args += ' ' + extra_args
     args += ' -- ' + db
     run('{python} {replacedb} {args}'.format(python=env.app.python,
                                              replacedb=replacedb_path,
