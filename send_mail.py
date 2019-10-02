@@ -1,7 +1,11 @@
 import json
 import requests
-import urllib2
 import python_http_client
+try:
+    from urllib.error import HTTPError
+except:
+    # py3remove
+    from urllib2 import HTTPError
 
 from django.conf import settings
 
@@ -60,7 +64,7 @@ def sendgrid_send(subject,
 
     try:
         response = sg.client.mail.send.post(request_body=data)
-    except (urllib2.HTTPError, http_client_error.HTTPError) as e:
+    except (HTTPError, http_client_error.HTTPError) as e:
         raise MailError('HTTPError: {}'.format(e.body))
     except Exception as e:
         raise MailError('Unknown Exception: {}'.format(e.body))

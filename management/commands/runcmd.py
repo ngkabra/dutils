@@ -7,6 +7,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         script = options['script']
-        arguments = options['arguments']
+        args = []
+        kwargs = {}
+        for argument in options['arguments']:
+            if '=' in argument:
+                key, value = argument.split('=', 1)
+                kwargs[key] = value
+            else:
+                args.append(argument)
         mod = __import__(script, [], [], [' '])
-        mod.run(*arguments)
+        mod.run(*args, **kwargs)

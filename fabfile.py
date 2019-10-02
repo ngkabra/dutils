@@ -66,10 +66,14 @@ class App(object):
         self.managepy = self.python + ' manage.py '
         self.prefix = prefix
 
-    def __unicode__(self):
+    def __str__(self):
         return '{name}::{host}/{dir}'.format(name=self.name,
                                              host=self.host,
                                              dir=self.dir)
+
+    # py3remove
+    def __unicode__(self):
+        return self.__str__()
 
 
 class LocalApp(App):
@@ -363,7 +367,7 @@ def getmediaonly(db_dest_file=None, media_dest_file=None):
 
 
 @cmd_category('Local only')
-def getreplacedb(dbonly=None, mediaonly=None):
+def getreplacedb(dbonly=None, mediaonly=None, extra_args=''):
     '''Get db from remote replace local db. Dont fix demo'''
     if dbonly and mediaonly:
         abort('Cant specify both flags')
@@ -379,7 +383,7 @@ def getreplacedb(dbonly=None, mediaonly=None):
     db_filename = app_to_dbfilename(env.apps[0])
     apps('localhost')
     if not mediaonly:
-        replacedb(db=db_filename, demo=False)
+        replacedb(db=db_filename, demo=False, extra_args=extra_args)
     # no replacemedia since we use rsync
 
 
@@ -396,7 +400,7 @@ def getreplacedball():
 
 
 @projtask
-def replacedb(db, demo=None, nosync=None, verbose=None):
+def replacedb(db, demo=None, nosync=None, verbose=None, extra_args=''):
     'Replace db with {db}. {demo}=True will fix_demo. Does not replacemedia'
     if 'local' not in env.app.name and 'demo' not in env.app.name:
         abort('WTF?! Trying to replace production? [{}]'.format(env.app.name))
@@ -413,8 +417,7 @@ def replacedb(db, demo=None, nosync=None, verbose=None):
     if verbose:
         args += ' -d'
     args += ' -v'  # log to stdout
-    # we're not doing demos anymore
-    # args += ' -r'  # register evaluators for reliscore
+    args += ' ' + extra_args
     args += ' -- ' + db
     run('{python} {replacedb} {args}'.format(python=env.app.python,
                                              replacedb=replacedb_path,
@@ -431,8 +434,12 @@ def replacemedia(mediafile):
     run('tar -xvzf {}'.format(mediafile))
 
 
-def runscript_(script, **kw):
-    managepy('runcmd {0}'.format(script))
+def runscript_(script, *args, **kwargs):
+    managepy('runcmd {} {} {}'.format(
+        script,
+        ' '.join(args),
+        ' '.join('{}={}'.format(k, v) for k, v in kwargs.items()),
+    ))
 
 
 @projtask
@@ -552,7 +559,7 @@ def wfinstall(package):
 
 
 def help(func=None, cat=None):
-    '''Print a nice list of fab commands'''
+    '''Output a nice list of fab commands'''
     flist = defaultdict(list)
     for n, f in inspect.getmembers(sys.modules[__name__],
                                    inspect.isfunction):
@@ -565,7 +572,7 @@ def help(func=None, cat=None):
                 continue
             flist[cmd_category].append(f)
 
-    for c, funcs in flist.iteritems():
+    for c, funcs in flist.items():
         print('{}:'.format(c))
         for f in funcs:
             if f.__doc__:
