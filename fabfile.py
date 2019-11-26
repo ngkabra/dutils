@@ -547,9 +547,13 @@ def rcmd(c):
 
 
 @projtask
-def mcmd(c):
-    '''manage.py {c} - at remote'''
-    managepy(c)
+def mcmd(c, *args, **kwargs):
+    '''manage.py {c} {*args} {**kwargs}}  - at remote'''
+    managepy('{} {} {}'.format(
+        c,
+        ' '.join(args),
+        ' '.join('{}={}'.format(k, v) for k, v in kwargs.items()),
+    ))
 
 
 @wftask
