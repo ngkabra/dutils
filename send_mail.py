@@ -64,7 +64,7 @@ def sendgrid_send(subject,
 
     try:
         response = sg.client.mail.send.post(request_body=data)
-    except (HTTPError, http_client_error.HTTPError) as e:
+    except (HTTPError) as e:
         raise MailError('HTTPError: {}'.format(e.body))
     except Exception as e:
         raise MailError('Unknown Exception: {}'.format(e.body))
