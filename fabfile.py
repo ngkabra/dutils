@@ -39,6 +39,7 @@ findmigs (== schemamigration <appname> --auto)
 compass compile, celeryd, nosetests
 shell_plus, runscript
 '''
+from __future__ import print_function
 
 from collections import defaultdict
 import inspect

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Use to check if wsgi is set up properly
 # python dutils/test_wsgi_server [mytwit/]wsgip3[.py]
+from __future__ import print_function
 from wsgiref.util import setup_testing_defaults
 from wsgiref.simple_server import make_server
 from os import sys, path
