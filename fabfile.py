@@ -53,6 +53,7 @@ import re
 import sys
 
 from fabric.api import *
+from fabric2 import Connection
 
 # see below for default value of env.apps
 
