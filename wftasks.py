@@ -14,9 +14,14 @@ def autoconfig(c):
     c['wfhome'] = '/home/navin'
     c['wfdir'] = '{wfhome}/webapps/{project}'.format(wfhome=c.wfhome,
                                                      project=c.project)
-    c['projdir'] = '{wfdir}/myproject'.format(wfdir=c.wfdir)
     c['python'] = '{wfhome}/.v/{venv}/bin/python'.format(
         wfhome=c.wfhome, venv=c.venv)
+
+    # projdir is for git commands, managepydir is for manage.py
+    c['projdir'] = '{wfdir}/myproject'.format(wfdir=c.wfdir)
+    c['managepydir'] = c.projdir
+    if c.config.get('managepy_subdir'):
+        c.managepydir = join(c.projdir, c.managepy_subdir)
 
 
 @task
