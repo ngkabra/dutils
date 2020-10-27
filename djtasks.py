@@ -13,7 +13,7 @@ def autoconfig(c):
     Expects the following to already be autoconfiged
     python, project, projdir, managepydir, backups_dir'''
     c['dumpdb_filename'] = 'u/{project}.sql.gz'.format(project=c.project)
-    c['mediagz_filename'] = 'u/media.tgz'
+    c['mediagz_filename'] = 'u/{project}-media.tgz'.format(project=c.project)
     c['proj_backup_dir'] = '{backups_dir}/{project}'.format(
         backups_dir=c.backups_dir, project=c.project)
     c['media_backup_dir'] = c.proj_backup_dir + '/media/'
@@ -48,7 +48,7 @@ def dumpmedia(c, dest_file=None):
     mediadir = managepy(c, 'mediadir').strip()
     mediasrc = '{host}:{mediadir}'.format(host=c.host, mediadir=mediadir)
     mediadest = c.media_backup_dir
-    mediazip = backup_filename(c, 'media', 'tgz')
+    mediazip = backup_filename(c, 'media', '.tgz')
     
     c.local("rsync -avz -e ssh {mediasrc} {mediadest}".format(
         mediasrc=mediasrc,
