@@ -8,8 +8,6 @@ from . import djtasks
 
 @task
 def autoconfig(c, force=False):
-    if force or not c.config.get('lproject'):
-        c['lproject'] = 'rs'
     if force or not c.config.get('lvenv'):
         c['lvenv'] = c.lproject
 
