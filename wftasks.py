@@ -1,43 +1,59 @@
 from invoke import Collection, task
+from dutils import djtasks
+from dutils import localtasks
 
 
+@task
 def autoconfig(c):
-    name = c.original_host
-    host = name             # host defaults to name for now ('rsh')
+    '''Autoconfig for webfaction tasks'''
+    if not c.config.get('project'):
+        c['project'] = c.original_host # default for now ('rsh')
     if not c.config.get('venv'):
-        c.config['venv'] = name
+        c.config['venv'] = c.project
 
-    c['home'] = '/home/navin'
-    c['wfdir'] = '{home}/webapps/{name}'.format(home=c.home, name=name)
+    c['wfhome'] = '/home/navin'
+    c['wfdir'] = '{wfhome}/webapps/{project}'.format(wfhome=c.wfhome,
+                                                     project=c.project)
     c['projdir'] = '{wfdir}/myproject'.format(wfdir=c.wfdir)
-    c['python'] = '{home}/.v/{venv}/bin/python'.format(home=c.home, venv=c.venv)
+    c['python'] = '{wfhome}/.v/{venv}/bin/python'.format(
+        wfhome=c.wfhome, venv=c.venv)
+
+
+@task
+def restart(c):
+    autoconfig(c)
+    c.run('{wfdir}/apache2/bin/restart'.format(wfdir=c.wfdir))
 
 
 @task
 def managepy(c, command):
     autoconfig(c)
-    with c.cd(c.projdir):
-        c.run("{python} manage.py {command}".format(
-            python=c.python, command=command))
+    djtasks.managepy(c, command)
 
 
 @task
-def ls(c, directory=None):
-    if not directory:
-        c.run('ls')
-    else:
-        with c.cd(directory):
-            c.run('ls')
+def getdb(c):
+    autoconfig(c)
+    dbfile = djtasks.getdbonly(c)
+    djtasks.dumpmedia(c)
+    local_ctx = localtasks.local_context(c)
+    localtasks.replacedb(local_ctx, dbfile)
 
 
 @task
-def host(c):
-    try:
-        print('original_host', c.original_host)
-    except AttributeError:
-        print('No original_host')
+def runscript(c, script, *args, **kwargs):
+    autoconfig(c)
+    djtasks.runscript(script, *args, **kwargs)
 
-    try:
-        print('host', c.host)
-    except AttributeError:
-        print('No host')
+
+@task
+def upgrade(c):
+    autoconfig(c)
+    djtasks.upgrade(c)
+    restart(c)
+
+
+@task
+def dumpmedia(c):
+    autoconfig(c)
+    djtasks.dumpmedia(c)
