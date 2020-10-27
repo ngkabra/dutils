@@ -106,7 +106,7 @@ def regevals(c, company=None):
     '''register evaluators for company (or all companies if None)'''
     forcelocal(c)
     company_arg = company or "reliscore"
-    managepy("register_evaluators -f -c {}".format(company_arg))
+    managepy(c, "register_evaluators -f -c {}".format(company_arg))
 
 
 @task
