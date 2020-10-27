@@ -8,10 +8,10 @@ from . import djtasks
 
 @task
 def autoconfig(c, force=False):
-    if force or not c.config.get('project'):
-        c['project'] = 'rs'
-    if force or not c.config.get('venv'):
-        c['venv'] = c.project
+    if force or not c.config.get('lproject'):
+        c['lproject'] = 'rs'
+    if force or not c.config.get('lvenv'):
+        c['lvenv'] = c.lproject
 
     if force:
         c['host'] = None
@@ -19,8 +19,14 @@ def autoconfig(c, force=False):
 
     c['home'] = '/home/navin'
     c['wfdir'] = None
-    c['projdir'] = '{home}/{project}'.format(home=c.home, project=c.project)
-    c['python'] = '{home}/.v/{venv}/bin/python'.format(home=c.home, venv=c.venv)
+    c['projdir'] = '{home}/{lproject}'.format(home=c.home,
+                                              lproject=c.lproject)
+    c['managepydir'] = c.projdir
+    if c.config.get('managepy_subdir'):
+        c.managepydir = join(c.projdir, c.managepy_subdir)
+        
+    c['python'] = '{home}/.v/{lvenv}/bin/python'.format(home=c.home,
+                                                        lvenv=c.lvenv)
 
 
 def local_context(c):

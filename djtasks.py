@@ -11,7 +11,7 @@ def autoconfig(c):
     '''Autoconfig for django tasks
 
     Expects the following to already be autoconfiged
-    python, project, projdir, backups_dir'''
+    python, project, projdir, managepydir, backups_dir'''
     c['dumpdb_filename'] = 'u/{project}.sql.gz'.format(project=c.project)
     c['mediagz_filename'] = 'u/media.tgz'
     c['proj_backup_dir'] = '{backups_dir}/{project}'.format(
@@ -30,7 +30,7 @@ def backup_filename(c, prefix, ext):
 @task
 def managepy(c, command):
     autoconfig(c)
-    with c.cd(c.projdir):
+    with c.cd(c.managepydir):
         result = c.run("{python} manage.py {command}".format(
             python=c.python, command=command), echo=True)
         return result.stdout
