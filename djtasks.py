@@ -12,6 +12,7 @@ def autoconfig(c):
 
     Expects the following to already be autoconfiged
     python, project, projdir, managepydir, backups_dir'''
+
     c['dumpdb_filename'] = 'u/{project}.sql.gz'.format(project=c.project)
     c['mediagz_filename'] = 'u/{project}-media.tgz'.format(project=c.project)
     c['proj_backup_dir'] = '{backups_dir}/{project}'.format(

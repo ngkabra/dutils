@@ -8,7 +8,8 @@ from . import djtasks
 
 @task
 def autoconfig(c, force=False):
-    if force or not c.config.get('lvenv'):
+    if not c.config.get('lvenv'):
+        # No `force` here because lvenv is only set locally
         c['lvenv'] = c.lproject
 
     if force:
