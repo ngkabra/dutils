@@ -38,7 +38,7 @@ def sendgrid_send(subject,
         if e.lower() in to_emails:
             raise MailError('Email {} in cc/bcc also in to'.format(e))
 
-    sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_KEY)
+    sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_KEY)
     data = {
         "personalizations": [
             {
