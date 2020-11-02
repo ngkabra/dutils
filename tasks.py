@@ -337,9 +337,8 @@ def findmigs(c, appname=''):
 
 
 @task
-def compass(c):
+def compass(c, compass_directory='base/static'):
     forcelocal(c)
-    compass_directory = 'base/static'
     c.run('cd {} && compass compile'.format(compass_directory))
 
 
