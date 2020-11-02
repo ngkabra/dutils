@@ -143,7 +143,7 @@ class OpalConfig(DjangoConfig):
     
     @property
     def restart_commands(self):
-        envdir = join(self.home, 'apps', self.project, 'env')
+        appdir = join(self.home, 'apps', self.project)
         return [join(envdir, 'stop'), join(envdir, 'start')]
 
 
