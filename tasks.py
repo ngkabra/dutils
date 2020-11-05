@@ -158,11 +158,11 @@ class LocalConfig(DjangoConfig):
 
     def lrun(self, cmd, *args, **kwargs):
         try:
-            self.context.local(cmd, *args, **kwargs)
+            return self.context.local(cmd, *args, **kwargs)
         except AttributeError:
             if getattr(c, 'host', 'localhost') != 'localhost':
                 raise Exception('This is a local-only command')
-            c.context.run(cmd, *args, **kwargs)
+            return c.context.run(cmd, *args, **kwargs)
 
 
 def autoconfig(c):
@@ -199,11 +199,14 @@ def restart(c):
 
 
 @task
-def managepy(c, command):
+def managepy(c, command, local=False):
+    '''Run managepy. Remote by default, but locally if local=True'''
     autoconfig(c)
-    with c.cd(c.rconfig.managepydir):
-        result = c.run("{rpython} manage.py {command}".format(
-            rpython=c.rconfig.python, command=command), echo=True)
+    cfg = c.lconfig if local else c.rconfig
+    runner = cfg.lrun if local else c.run
+    with c.cd(cfg.managepydir):
+        result = runner("{python} manage.py {command}".format(
+            python=cfg.python, command=command), echo=True)
         return result.stdout
 
 
