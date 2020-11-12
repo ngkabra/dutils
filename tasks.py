@@ -263,11 +263,20 @@ def getdbonly(c):
 
 
 @task
-def runscript(c, script, *args, **kwargs):
+def runcmd(c, script, args=''):
+    '''
+    Call managepy::runcmd with args as a comma-separated arg list
+
+    remember: managepy::runcmd runs a standalone script with django initialized
+    This is not to run a managepy django command
+    managepy::runcmd expects arguments of the form a0 a1 kw1=kwarg1 etc
+
+    This runcmd takes same arguments but comma separated
+    fab -H rsh runcmd scripts.needs_attention a1,a2,kw1=kwarg1,kw2=kwarg2
+    '''
     autoconfig(c)
-    managepy(c, command='runcmd {} {} {}'.format(
-        script, ' '.join(args),
-        ' '.join('{}={}'.format(k, v) for k, v in kwargs.items())))
+    managepy(c, command='runcmd {} {}'.format(script,
+                                              ' '.join(args.split(','))))
 
 
 @task
