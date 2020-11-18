@@ -136,5 +136,5 @@ if args.register_evaluators:
 if args.demo:
     cmds.append(['runcmd', args.fixdemoscript])
 for cmd in cmds:
-    logger.info('Executing: <manage.py> cmd'.format(cmd))
+    logger.info('Executing: <manage.py> {}'.format(cmd))
     execute_from_command_line([sys.argv[0]] + cmd)
