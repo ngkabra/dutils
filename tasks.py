@@ -295,11 +295,11 @@ def upgrade(c):
     
 
 @task
-def getdb(c):
+def getdb(c, nomigs=False):
     # getdbonly will do autoconfig
     dbfile = getdbonly(c)
     dumpmedia(c)
-    replacedb(c, dbfile)
+    replacedb(c, dbfile, nomigs=nomigs)
 
 
 def forcelocal(c):
