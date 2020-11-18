@@ -1,3 +1,6 @@
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
+
 from datetime import datetime
 from invoke import Collection, task
 from os import symlink, remove
@@ -346,7 +349,14 @@ def tags(c):
 def findmigs(c, appname=''):
     '''find migrations'''
     forcelocal(c)
-    managepy(c, 'schemamigration {appname}'.format(appname=appname))
+    managepy(c, 'makemigrations {appname}'.format(appname=appname))
+
+
+@task
+def migrate(c, appname=''):
+    '''apply migrations'''
+    forcelocal(c)
+    managepy(c, 'migrate -v 0 {appname}'.format(appname=appname))
 
 
 @task
