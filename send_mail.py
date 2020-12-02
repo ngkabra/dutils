@@ -25,7 +25,7 @@ def sendgrid_send(subject,
                   message,
                   from_email,
                   to_emails,
-                  from_email_name="RSphinx Admin",
+                  from_email_name="ReliScore Admin",
                   cc_emails=[],
                   bcc_emails=[]):
 
