@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
-from django.contrib.auth.views import redirect_to_login
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils.decorators import method_decorator
 from django.views.generic import RedirectView, TemplateView
 
@@ -14,84 +14,9 @@ except ImportError:
     commit_on_success = identity_decorator
 
 
-class AccessMixin(object):
-    """
-    'Abstract' mixin that gives access mixins the same customizable
-    functionality.
-    """
-    login_url = settings.LOGIN_URL  # LOGIN_URL from project settings
-    raise_exception = False  # Default whether to raise an exception to none
-    redirect_field_name = REDIRECT_FIELD_NAME
-
-    def get_login_url(self):
-        """
-        Override this method to customize the login_url.
-        """
-        if self.login_url is None:
-            raise ImproperlyConfigured(
-                "%(cls)s is missing the login_url. "
-                "Define %(cls)s.login_url or override "
-                "%(cls)s.get_login_url()." % {"cls": self.__class__.__name__})
-
-        return self.login_url
-
-    def get_redirect_field_name(self):
-        """
-        Override this method to customize the redirect_field_name.
-        """
-        if self.redirect_field_name is None:
-            raise ImproperlyConfigured(
-                "{cls} is missing the "
-                "redirect_field_name. Define {cls}.redirect_field_name or "
-                "override {cls}.get_redirect_field_name().".format(
-                    cls=self.__class__.__name__))
-
-        return self.redirect_field_name
-
-
-class UserPassesTestMixin(AccessMixin):
-    """
-    View mixin which verifies that the user is passes a given test
-
-    The test should be put in the over-ridden method `user_passes_test`
-    Redirect to login if user fails the test
-
-    NOTE:
-    This should be the left-most mixin of a view.
-    """
-    def user_passes_test(self, user):
-        '''Derived Classes have to over-ride this'''
-        raise PermissionDenied
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.user_passes_test(request.user):
-            if self.raise_exception:
-                raise PermissionDenied  # return a forbidden response
-            else:
-                return redirect_to_login(
-                    request.get_full_path(),
-                    self.get_login_url(),
-                    self.get_redirect_field_name())
-        return super(UserPassesTestMixin, self).dispatch(request,
-                                                         *args,
-                                                         **kwargs)
-
-
-class LoginRequiredMixin(UserPassesTestMixin):
-    def user_passes_test(self, user):
-        return user.is_authenticated
-
-
 class StaffRequiredMixin(UserPassesTestMixin):
-    def user_passes_test(self, user):
-        return user.is_staff
-
-
-class UserHasPermissionMixin(UserPassesTestMixin):
-    permission = None
-
-    def user_passes_test(self, user):
-        return user.has_perm(self.permission)
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class CommitOnSuccessMixin(object):
