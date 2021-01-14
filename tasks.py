@@ -283,6 +283,13 @@ def runcmd(c, script, args=''):
 
 
 @task
+def gitpull(c):
+    autoconfig(c)
+    with c.cd(c.rconfig.projdir):
+        c.run('git pull')
+
+
+@task
 def upgrade(c):
     autoconfig(c)
     with c.cd(c.rconfig.projdir):
