@@ -50,14 +50,17 @@ class AdditionalContextMixin(object):
 
 
 class NextURLMixin(object):
-    def get_next_url(self, request):
-        return request.GET.get('next', request.POST.get('next', None))
+    def get_next_url(self, request, *args, **kwargs):
+        return request.GET.get(
+            'next', request.POST.get(
+                'next', kwargs.get(
+                    'next_url', kwargs.get('next'))))
 
 
 class NextOnSuccessMixin(object):
     '''Use with FormView and descendents'''
-    def get_success_url(self):
-        next_url = self.get_next_url(self.request)
+    def get_success_url(self, *args, **kwargs):
+        next_url = self.get_next_url(self.request, *args, **kwargs)
         if next_url:
             return next_url
         return super(NextOnSuccessMixin, self).get_success_url()
@@ -73,7 +76,7 @@ class ActionAndRedirectView(RedirectView):
 class ActionAndRedirectToNextView(NextURLMixin, ActionAndRedirectView):
     '''self.action is the action, and 'next' param is the redirect'''
     def get_redirect_url(self, *args, **kwargs):
-        return self.get_next_url(self.request) or '/'
+        return self.get_next_url(self.request, *args, **kwargs) or '/'
 
 
 class TemplateViewWithExtraContext(AdditionalContextMixin, TemplateView):
