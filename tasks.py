@@ -146,8 +146,7 @@ class OpalConfig(DjangoConfig):
     
     @property
     def restart_commands(self):
-        appdir = join(self.home, 'apps', self.project)
-        return [' '.join(['touch', join(appdir, 'wsgi.py')])]
+        return [' '.join(['touch', join(self.projdir, 'wsgi.py')])]
 
 
 class LocalConfig(DjangoConfig):
@@ -280,6 +279,13 @@ def runcmd(c, script, args=''):
     autoconfig(c)
     managepy(c, command='runcmd {} {}'.format(script,
                                               ' '.join(args.split(','))))
+
+
+@task
+def gitpull(c):
+    autoconfig(c)
+    with c.cd(c.rconfig.projdir):
+        c.run('git pull')
 
 
 @task
