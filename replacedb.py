@@ -36,24 +36,26 @@ def replace_db(dbfile):
     logger.debug('Replacing db from {}'.format(dbfile))
 
     db = settings.DATABASES['default']
+    orig_dbname = db['NAME']
+    dbname = orig_dbname + '_tmp'
 
     # sanity check
-    if db['NAME'] in ('navin_rs', 'navin_rsph'):
+    if dbname in ('navin_rs', 'navin_rsph'):
         raise Exception('WTF? Are you trying to replace production?')
 
     # drop and recreate database
-    logger.debug('mysql connect {}'.format(db['NAME']))
-    rootdb = mysql.connect(user=db['NAME'],
+    logger.debug('mysql connect {}'.format(dbname))
+    rootdb = mysql.connect(user=db['USER'],
                            passwd=db['PASSWORD'])
     c = rootdb.cursor()
     try:
-        c.execute('drop database %s' % db['NAME'])
-        logger.debug('Dropped database {}'.format(db['NAME']))
+        c.execute('drop database %s' % dbname)
+        logger.debug('Dropped database {}'.format(dbname))
     except:
         pass                              # ignore drop database errors
     c.execute('create database {} character set utf8 '
-              'collate utf8_general_ci'.format(db['NAME']))
-    logger.debug('Created database {}'.format(db['NAME']))
+              'collate utf8_general_ci'.format(dbname))
+    logger.debug('Created database {}'.format(dbname))
     c.close()
     rootdb.close()
 
@@ -63,13 +65,13 @@ def replace_db(dbfile):
     unzipproc = subprocess.Popen(['gunzip', '--stdout', dbfile],
                                  stdout=subprocess.PIPE)
     mysqlproc = subprocess.Popen(
-        ['mysql', '-u', db['USER'],
-         '--password={}'.format(db['PASSWORD'],),
-         db['NAME']],
+        ['mysql', '--login-path', db['USER'], dbname],
         stdin=unzipproc.stdout, stdout=subprocess.PIPE)
     unzipproc.stdout.close()
     logger.debug('Waiting for gunzip|mysql process')
     mysqlproc.wait()
+
+    subprocess.call([expanduser('~/bin/dbrename'), orig_dbname, dbname])
 
     # notifications_TODO: truncate the notifications
     # mydb = mysql.connect(user=db['USER'],
@@ -124,11 +126,8 @@ replace_db(args.file)
 if args.no_syncdb:
     logger.info('Skipping sync commands')
     cmds = []
-elif django.VERSION[0] > 1 or django.VERSION[1] >= 7:
-    # no syncdb in django 1.7 or above
-    cmds = [['migrate']]
 else:
-    cmds = [['syncdb'], ['migrate']]
+    cmds = [['migrate']]
 
 if args.register_evaluators:
     cmds += [['register_evaluators', '-f', '-c', 'reliscore']]
