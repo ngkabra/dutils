@@ -45,8 +45,7 @@ def replace_db(dbfile):
 
     # drop and recreate database
     logger.debug('mysql connect {}'.format(dbname))
-    rootdb = mysql.connect(user=db['USER'],
-                           passwd=db['PASSWORD'])
+    rootdb = mysql.connect(user=db['USER'], passwd=db['PASSWORD'])
     c = rootdb.cursor()
     try:
         c.execute('drop database %s' % dbname)
@@ -62,16 +61,17 @@ def replace_db(dbfile):
     logger.info('replacedb started at {0:%H:%M:%S}'.format(datetime.now()))
     # now load the data. For that first gunzip it,
     # then run mysql in a subprocess
+    cmd = ['mysql', '-u', db['USER'], f"--password={db['PASSWORD']}", dbname]
+    logger.debug(f'Running: {cmd}')
     unzipproc = subprocess.Popen(['gunzip', '--stdout', dbfile],
                                  stdout=subprocess.PIPE)
-    mysqlproc = subprocess.Popen(
-        ['mysql', '--login-path', db['USER'], dbname],
-        stdin=unzipproc.stdout, stdout=subprocess.PIPE)
+    mysqlproc = subprocess.Popen(cmd, stdin=unzipproc.stdout,
+                                 stdout=subprocess.PIPE)
     unzipproc.stdout.close()
     logger.debug('Waiting for gunzip|mysql process')
     mysqlproc.wait()
-
-    subprocess.call([expanduser('~/bin/dbrename'), orig_dbname, dbname])
+    logger.debug(f'Successfully created {dbname}. Now renaming.')
+    subprocess.call([expanduser('~/bin/dbrename'), dbname, orig_dbname])
 
     # notifications_TODO: truncate the notifications
     # mydb = mysql.connect(user=db['USER'],
