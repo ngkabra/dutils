@@ -16,7 +16,6 @@ import sys
 import subprocess
 import MySQLdb as mysql
 from logging.config import fileConfig
-import django
 from django.conf import settings
 from django.core.management import execute_from_command_line
 
@@ -44,7 +43,7 @@ def replace_db(dbfile):
         raise Exception('WTF? Are you trying to replace production?')
 
     # drop and recreate database
-    logger.debug('mysql connect {}'.format(dbname))
+    logger.debug(f"mysql connect user={db['USER']}")
     rootdb = mysql.connect(user=db['USER'], passwd=db['PASSWORD'])
     c = rootdb.cursor()
     try:
@@ -71,8 +70,9 @@ def replace_db(dbfile):
     logger.debug('Waiting for gunzip|mysql process')
     mysqlproc.wait()
     logger.debug(f'Successfully created {dbname}. Now renaming.')
-    subprocess.call([expanduser('~/bin/dbrename'), dbname, orig_dbname])
-
+    subprocess.run([expanduser('~/bin/dbrename'), dbname, orig_dbname],
+                   check=True)
+    logger.info(f'replaced db: {dbname} with {orig_dbname}')
     # notifications_TODO: truncate the notifications
     # mydb = mysql.connect(user=db['USER'],
     #                     passwd=db['PASSWORD'],
@@ -120,6 +120,9 @@ for path_el in args.project_path[::-1]:
     # insert in reverse order to get correct order
 if args.settings_module:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', args.settings_module)
+
+# Ughhh. HACK. To make dbrename work properly
+os.environ.setdefault('HOME', expanduser('~'))
 
 replace_db(args.file)
 
