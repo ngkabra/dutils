@@ -380,6 +380,17 @@ def regevals(c, company=None):
 
 
 @task
+def force_copysearch(c):
+    managepy(c, 'index_solutions')
+    managepy(c, 'copy_search')
+
+
+@task
+def force_needs_attention(c):
+    managepy(c, 'needs_attention')
+
+
+@task
 def replacedb(c, dbfile=None, nomigs=False, verbose=False):
     '''Replace db
 
