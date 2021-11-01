@@ -289,7 +289,13 @@ def gitpull(c):
 
 
 @task
-def upgrade(c):
+def collectstatic(c):
+    autoconfig(c)
+    managepy(c, 'collectstatic --noinput')
+
+
+@task
+def upgrade_no_restart(c):
     autoconfig(c)
     with c.cd(c.rconfig.projdir):
         c.run('git pull')
@@ -297,6 +303,12 @@ def upgrade(c):
 
     managepy(c, 'migrate -v 0')
     managepy(c, 'collectstatic --noinput')
+
+
+@task
+def upgrade(c):
+    autoconfig(c)
+    upgrade_no_restart(c)
     restart(c)
     
 
