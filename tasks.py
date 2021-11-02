@@ -398,8 +398,8 @@ def force_copysearch(c):
 
 
 @task
-def force_needs_attention(c):
-    managepy(c, 'needs_attention')
+def precompute_attention(c):
+    managepy(c, 'precompute_attention')
 
 
 @task
