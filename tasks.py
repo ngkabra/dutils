@@ -162,9 +162,9 @@ class LocalConfig(DjangoConfig):
         try:
             return self.context.local(cmd, *args, **kwargs)
         except AttributeError:
-            if getattr(c, 'host', 'localhost') != 'localhost':
+            if getattr(self.context, 'host', 'localhost') != 'localhost':
                 raise Exception('This is a local-only command')
-            return c.context.run(cmd, *args, **kwargs)
+            return self.context.run(cmd, *args, **kwargs)
 
 
 def autoconfig(c):
