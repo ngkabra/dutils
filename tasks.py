@@ -2,10 +2,9 @@ from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
 from datetime import datetime
-from invoke import Collection, task
+from invoke import task
 from os import symlink, remove
 from os.path import expanduser, join, dirname, lexists
-import shutil
 
 
 class BaseConfig():
