@@ -1,13 +1,6 @@
-from future import standard_library
-standard_library.install_aliases()
 import json
 import requests
-import python_http_client
-try:
-    from urllib.error import HTTPError
-except:
-    # py3remove
-    from urllib.error import HTTPError
+from urllib.error import HTTPError
 
 from django.conf import settings
 
