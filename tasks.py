@@ -380,7 +380,8 @@ def migrate(c, appname=''):
 @task
 def compass(c, compass_directory='base/static'):
     forcelocal(c)
-    c.run('cd {} && compass compile'.format(compass_directory))
+    with c.cd(c.lconfig.projdir):
+        c.run('cd {} && compass compile'.format(compass_directory))
 
 
 @task
