@@ -1,5 +1,5 @@
-elpy
-flake8
-mypy
-pyflakes
-readline # maybe this needs sudo apt install libncurses5-dev
+# elpy
+# flake8
+# mypy
+# pyflakes
+# readline # maybe this needs sudo apt install libncurses5-dev
