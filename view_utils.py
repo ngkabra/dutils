@@ -1,6 +1,3 @@
-from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
-from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils.decorators import method_decorator
 from django.views.generic import RedirectView, TemplateView

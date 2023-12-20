@@ -82,7 +82,6 @@ class DjangoConfig(BaseConfig):
     def proj_backup_dir(self):
         return join(self.backups_dir, self.project)
 
-
     def backup_file(self, relpath):
         return join(self.proj_backup_dir, relpath)
 
@@ -142,7 +141,7 @@ class OpalConfig(DjangoConfig):
     @property
     def python(self):
         return join(self.home, 'apps', self.project, 'env', 'bin', 'python')
-    
+
     @property
     def restart_commands(self):
         return [join(self.home, 'apps', self.project, 'stop'),
@@ -225,7 +224,7 @@ def dumpmedia(c, dest_file=None):
     rsync_src = '{host}:{media_rdir}'.format(host=c.host, media_rdir=media_rdir)
     rsync_dest = c.rconfig.media_backup_dir
     mediagz_tsfile = c.rconfig.mediagz_tsfile
-    
+
     c.local("rsync -avz -e ssh {rsync_src} {rsync_dest}".format(
         rsync_src=rsync_src,
         rsync_dest=rsync_dest), echo=True)
@@ -253,7 +252,7 @@ def getdbonly(c):
     rdumpdb_file = join(c.rconfig.home, dumpdb_relfile)
     dumpdb(c, rdumpdb_file)
     ldumpdb_tsfile = c.rconfig.timestamped_backup_file('db', '.sql.gz')
-    
+
     # soft link appropriately
     ldumpdb_file = join(c.rconfig.lhome, dumpdb_relfile)
     if lexists(ldumpdb_file):
@@ -310,7 +309,7 @@ def upgrade(c):
     autoconfig(c)
     upgrade_no_restart(c)
     restart(c)
-    
+
 
 @task
 def getdb(c, nomigs=False):
@@ -330,36 +329,36 @@ def forcelocal(c):
 def tags(c):
     '''Re-build tags table for emacs'''
     forcelocal(c)
-    with(c.cd(c.lconfig.projdir)):
+    with c.cd(c.lconfig.projdir):
         c.run('find . -path "*migrations" -prune '
-              '-o -name \*.html -print '
-              '-o -name \*.py -print '
-              '-o -name \*.js -print '
-              '-o -name \*.sass -print '
+              r'-o -name \*.html -print '
+              r'-o -name \*.py -print '
+              r'-o -name \*.js -print '
+              r'-o -name \*.sass -print '
               '| etags -')
         c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-              '-o -name \*.html -print '
-              '-o -name \*.py -print '
-              '-o -name \*.js -print '
-              '-o -name \*.sass -print '
+              r'-o -name \*.html -print '
+              r'-o -name \*.py -print '
+              r'-o -name \*.js -print '
+              r'-o -name \*.sass -print '
               '| etags -o TAGS_NOEVALS -')
         c.run('find . -path "*migrations" -prune '
-              '-o -name \*.py -print '
-              '-o -name \*.sass -print '
+              r'-o -name \*.py -print '
+              r'-o -name \*.sass -print '
               '| etags -o TAGS_NOHTMLNOJS -')
         c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-              '-o -name \*.js -print '
-              '-o -name \*.sass -print '
-              '-o -name \*.html -print '
+              r'-o -name \*.js -print '
+              r'-o -name \*.sass -print '
+              r'-o -name \*.html -print '
               '| etags -o TAGS_ONLYJSHTML -')
         c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-              '-o -name \*.py -print '
-              '-o -name \*.sass -print '
+              r'-o -name \*.py -print '
+              r'-o -name \*.sass -print '
               '| etags -o TAGS_ONLYPY -')
         c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-              '-o -name \*.py -print '
-              '-o -name \*.html -print '
-              '-o -name \*.sass -print '
+              r'-o -name \*.py -print '
+              r'-o -name \*.html -print '
+              r'-o -name \*.sass -print '
               '| etags -o TAGS_ONLYPYHTML -')
 
 
