@@ -14,6 +14,25 @@ class MailError(Exception):
     pass
 
 
+def sendgrid_core_send(data):
+    '''data can be a sendgrid.Mail object or a dict'''
+    sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_KEY)
+    try:
+        if isinstance(data, sendgrid.Mail):
+            response = sg.send(data)
+        else:
+            response = sg.client.mail.send.post(request_body=data)
+    except (HTTPError) as e:
+        raise MailError('HTTPError: {}'.format(e.body))
+    except Exception as e:
+        raise MailError('Unknown Exception: {}'.format(e))
+
+    if response.status_code % 100 != 2:  # not 2xx
+        raise MailError("status={}, body={}".format(
+            response.status_code, response.body))
+    return response
+
+
 def sendgrid_send(subject,
                   message,
                   from_email,
@@ -31,7 +50,6 @@ def sendgrid_send(subject,
         if e.lower() in to_emails:
             raise MailError('Email {} in cc/bcc also in to'.format(e))
 
-    sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_KEY)
     data = {
         "personalizations": [
             {
@@ -57,17 +75,47 @@ def sendgrid_send(subject,
     if bcc_emails:
         data['personalizations'][0]['bcc'] = [{'email': e} for e in bcc_emails]
 
-    try:
-        response = sg.client.mail.send.post(request_body=data)
-    except (HTTPError) as e:
-        raise MailError('HTTPError: {}'.format(e.body))
-    except Exception as e:
-        raise MailError('Unknown Exception: {}'.format(e.body))
+    return sendgrid_core_send(data)
 
-    if response.status_code % 100 != 2:  # not 2xx
-        raise MailError("status={}, body={}".format(
-            response.status_code, response.body))
 
+def sendgrid_send_template(template_id,
+                           contexts,
+                           common_context, 
+                           from_email=settings.DEFAULT_REGISTRATIONS_FROM_EMAIL,
+                           from_email_name="ReliScore Registrations (do not reply)"):
+    '''
+    contexts is a list [[email, specific_context]] where specific_context is a dict
+    common_context is context to be added to all of them
+    
+    So:
+    contexts = [['navin@smriti.com', {'username': 'ngkabra'}], ['t@example.com', {'username': 'testuser1'}]]
+    common_context = {'company_name': 'ReliScore', 'test_name': 'Software Engineer'}
+    '''
+    if len(contexts) > 990:
+        raise MailError('Too many emails: {}. Break into chunks'.format(
+            len(contexts)))
+    
+    personalizations = [
+        {"to": [{"email": email}],
+         "dynamic_template_data": {**specific_context, **common_context}}
+         for email, specific_context in contexts]
+
+    to_emails = [
+        sendgrid.To(email=email,
+                    dynamic_template_data={**specific_context, **common_context})
+        for email, specific_context in contexts
+    ]
+    
+    message = sendgrid.Mail(
+        from_email=(from_email, from_email_name),
+        to_emails=to_emails,
+        subject="Generic Subject",
+        is_multiple=True,
+    )
+    message.template_id = template_id
+    
+    return sendgrid_core_send(message)
+    
 
 def mandrill_send(subject,
                   message,
