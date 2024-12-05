@@ -143,9 +143,13 @@ class OpalConfig(DjangoConfig):
         return join(self.home, 'apps', self.project, 'env', 'bin', 'python')
 
     @property
-    def restart_commands(self):
+    def restart_commands_alt(self):
         return [join(self.home, 'apps', self.project, 'stop'),
                 join(self.home, 'apps', self.project, 'start')]
+
+    @property
+    def restart_commands(self):
+        return [f'touch {join(self.projdir, "wsgi.py")}']
 
 
 class LocalConfig(DjangoConfig):
