@@ -97,8 +97,8 @@ def findmigs(c, appname=''):
 def compass(c):
     forcelocal(c)
     compass_directory = 'base/static'
-    c.run('cd {} && compass compile'.format(compass_directory))
-
+    # c.run('cd {} && compass compile'.format(compass_directory))
+    c.run('cd {} && docker compose up --build'.format(compass_directory))
 
 @task
 def regevals(c, company=None):
