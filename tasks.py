@@ -222,7 +222,7 @@ def dumpdb(c, dest_file):
 
 
 @task
-def dumpmedia(c, dest_file=None):
+def dumpmedia(c, dest_file=None, tarfile=False):
     autoconfig(c)
     media_rdir = managepy(c, 'mediadir').strip()
     rsync_src = '{host}:{media_rdir}'.format(host=c.host, media_rdir=media_rdir)
@@ -233,20 +233,24 @@ def dumpmedia(c, dest_file=None):
         rsync_src=rsync_src,
         rsync_dest=rsync_dest), echo=True)
 
-    # tar.gz the media for backup purposes
-    # do this in the background because it takes a long time
-    c.local("tar -czf {mediagz_tsfile} --directory {rsync_dest} .".format(
-        mediagz_tsfile=mediagz_tsfile,
-        rsync_dest=rsync_dest), disown=True, echo=True)
     site_media_symlink = join(c.lconfig.managepydir, 'site_media')
     if lexists(site_media_symlink):
         remove(site_media_symlink)
     symlink('{rsync_dest}/site_media'.format(rsync_dest=rsync_dest),
             site_media_symlink)
-    local_mediagz = c.rconfig.mediagz_file
-    if lexists(local_mediagz):
-        remove(local_mediagz)
-    symlink(mediagz_tsfile, local_mediagz)
+
+    if tarfile:
+        # tar.gz the media for backup purposes
+        # do this in the background because it takes a long time
+        # We used to do this everyday, but removed it because
+        # it would take a long time
+        c.local("tar -czf {mediagz_tsfile} --directory {rsync_dest} .".format(
+            mediagz_tsfile=mediagz_tsfile,
+            rsync_dest=rsync_dest), disown=True, echo=True)
+        local_mediagz = c.rconfig.mediagz_file
+        if lexists(local_mediagz):
+            remove(local_mediagz)
+        symlink(mediagz_tsfile, local_mediagz)
 
 
 @task
