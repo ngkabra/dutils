@@ -49,34 +49,34 @@ def tags(c):
     '''Re-build tags table for emacs'''
     forcelocal(c)
     c.run('find . -path "*migrations" -prune '
-          '-o -name \*.html -print '
-          '-o -name \*.py -print '
-          '-o -name \*.js -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.html -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.js -print '
+          r'-o -name \*.sass -print '
           '| etags -')
     c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.html -print '
-          '-o -name \*.py -print '
-          '-o -name \*.js -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.html -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.js -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_NOEVALS -')
     c.run('find . -path "*migrations" -prune '
-          '-o -name \*.py -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_NOHTMLNOJS -')
     c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.js -print '
-          '-o -name \*.sass -print '
-          '-o -name \*.html -print '
+          r'-o -name \*.js -print '
+          r'-o -name \*.sass -print '
+          r'-o -name \*.html -print '
           '| etags -o TAGS_ONLYJSHTML -')
     c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.py -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_ONLYPY -')
     c.run('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.py -print '
-          '-o -name \*.html -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.html -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_ONLYPYHTML -')
 
 

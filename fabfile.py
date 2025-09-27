@@ -171,34 +171,34 @@ def all():
 def tags():
     '''Re-build tags table for emacs'''
     local('find . -path "*migrations" -prune '
-          '-o -name \*.html -print '
-          '-o -name \*.py -print '
-          '-o -name \*.js -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.html -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.js -print '
+          r'-o -name \*.sass -print '
           '| etags -')
     local('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.html -print '
-          '-o -name \*.py -print '
-          '-o -name \*.js -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.html -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.js -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_NOEVALS -')
     local('find . -path "*migrations" -prune '
-          '-o -name \*.py -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_NOHTMLNOJS -')
     local('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.js -print '
-          '-o -name \*.sass -print '
-          '-o -name \*.html -print '
+          r'-o -name \*.js -print '
+          r'-o -name \*.sass -print '
+          r'-o -name \*.html -print '
           '| etags -o TAGS_ONLYJSHTML -')
     local('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.py -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_ONLYPY -')
     local('find . -path ./autoevals -prune -path "*migrations" -prune '
-          '-o -name \*.py -print '
-          '-o -name \*.html -print '
-          '-o -name \*.sass -print '
+          r'-o -name \*.py -print '
+          r'-o -name \*.html -print '
+          r'-o -name \*.sass -print '
           '| etags -o TAGS_ONLYPYHTML -')
 
 
